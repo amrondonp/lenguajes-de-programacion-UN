@@ -3,11 +3,12 @@ import java.io.*;
 
 public class Main {
 	
-
+	
+	static PrintWriter out;
 	static String buffer;
 	static final Character END = new Character('\0');
 	
-	static TreeSet<Token> tokens;
+	static ArrayList<Token> tokens;
 	static TreeSet<Character> validSymbols;
 	static int row;
 	static int column;
@@ -18,13 +19,17 @@ public class Main {
 	static HashMap<String, String> tokenName;
 	
 	
-	boolean isLetter(char c){return ('a' <=c && c<= 'z')|| ( 'A' <= c && c <= 'Z' );}
-	boolean isDigit( char c ) { return ( '0' <= c && c <= '9' ); }
-	boolean isWhiteSpace( char c ) { return ( c == '\n' || c == ' ' || c == '\t' || c == '\r' ); }
-	boolean isSymbol( char c ) { return validSymbols.contains(new Character(c));}	
+	public static boolean  isLetter(char c){return ('a' <=c && c<= 'z')|| ( 'A' <= c && c <= 'Z' );}
+	public static boolean  isDigit( char c ) { return ( '0' <= c && c <= '9' ); }
+	public static boolean  isWhiteSpace( char c ) { return ( c == '\n' || c == ' ' || c == '\t' || c == '\r' ); }
+	public static boolean  isSymbol( char c ) { return validSymbols.contains(new Character(c));}	
+	public static boolean  isValidCharacter( char c ) { return ( isLetter( c ) || isDigit( c ) || ( isWhiteSpace( c ) && c != '\n' ) || c == '_' ); }
 	
 	public static void init(){
-		row = column = p = 0;
+		tokenName = new HashMap<String, String>();
+		reservedWords = new TreeSet<String>();
+		validSymbols = new TreeSet<Character>();
+		tokens = new ArrayList<Token>();
 		tokenName.put("~", "token_neg");
 		tokenName.put("no", "token_neg");
 		tokenName.put("=", "token_igual");
@@ -113,7 +118,7 @@ public class Main {
 		reservedWords.add("finsubproceso");		
 	}
 	
-	boolean ignoreComment(){
+	public static boolean ignoreComment(){
 		boolean flag = false;
 		if(buffer.charAt(p) == '/' && buffer.charAt(p+1) == '/'){
 			while(buffer.charAt(p) != '\n'){
@@ -124,7 +129,7 @@ public class Main {
 		return flag;
 	}
 	
-	boolean ignoreWhiteSpace(){
+	public static boolean ignoreWhiteSpace(){
 		boolean flag = false;
 		while(isWhiteSpace(buffer.charAt(p))){
 			if(buffer.charAt(p) == '\n'){
@@ -137,7 +142,7 @@ public class Main {
 		return flag;
 	}
 	
-	void skip(){
+	static void skip(){
 		boolean trash;
 		do{
 			trash = false;
@@ -147,18 +152,107 @@ public class Main {
 		while(trash);
 	}
 	
-	public static void process() {
-			
+	public static Token readToken(){
+		Token tkn = new Token(row,column);
+		char c = buffer.charAt(p);
 		
+		if( isLetter(c) ){
+			c = buffer.charAt(p);
+			while( isLetter(c) || isDigit(c) || c == '_'){
+				p++; column++;
+				tkn.addChar(c);
+				c = buffer.charAt(p);
+			}
+			if(!reservedWords.contains(tkn.lexema) ) tkn.setToken("id");
+		}
+		else if( isDigit(c)){
+			if(c == '-' && !isDigit( buffer.charAt(p) ) ){
+				tkn.setToken( tokenName.get(tkn.lexema) );
+				tkn.setLexema("");
+			}
+			else{
+				c = buffer.charAt(p);
+				boolean real = false;
+				while( isDigit(c) || (c == '.' && !real && isDigit(buffer.charAt(p+1) ) ) ){
+					p++;column++;
+					real |= (c == '.');
+					tkn.addChar(c);
+					c = buffer.charAt(p);
+				}
+				if(real) tkn.setToken("token_real");
+				else tkn.setToken("token_entero");
+			}
+		}
+		else if(isSymbol(c) ){
+			if( c == '\'' || c == '\"' ){
+				int i = p;
+				while( buffer.charAt(i) != END) i++;
+				if(buffer.charAt(i) == '\"' || buffer.charAt(i) == '\''){
+					while(buffer.charAt(i) != '\'' && buffer.charAt(i) != '\"' ){
+						tkn.addChar(buffer.charAt(p));
+						tkn.setToken("token_cadena");
+						p++;column++;
+					}										
+				}
+				else{
+					error = new Error(row, column);
+					failure = true;
+				}		
+			}
+			else{
+				String temp = "";
+				temp +=(c + buffer.charAt(p));
+				if(tokenName.containsKey(temp) ){
+					tkn.addChar(buffer.charAt(p));
+					tkn.setToken(tokenName.get(tkn.lexema));
+					tkn.setLexema("");
+					p++;c++;
+				}
+				else if(tokenName.containsKey(tkn.lexema) ){
+					tkn.setToken(tokenName.get(tkn.lexema));
+					tkn.setLexema("");
+				}
+				else{
+					error = new Error(row,column-1);
+					failure = true;
+				}
+				
+			}
+		}
+		else{
+			error = new Error(row, column-1);
+			failure = true;
+		}
+		
+		return tkn;
 	}
 	
+	public static void printTokens(){
+		for(Token token: tokens){
+			out.println(token);
+		}
+		out.println(error);
+	}
+	
+	public static void split(){
+		p = 0;
+		row=column=1;
+		skip();
+		while(buffer.charAt(p) != END){
+			Token nextToken = readToken();
+			if(!failure) tokens.add(nextToken);
+			else break;
+			skip();
+		}
+	}
 	
 	public static void main(String[] args) throws IOException{
 		
 		init();
 		//BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		
-		BufferedReader br = new BufferedReader(new FileReader("D:/u/octavo/lenguajes/taller2/in.txt"));
+		BufferedReader br = new BufferedReader(new FileReader("in.txt"));
+		out = new PrintWriter(new BufferedOutputStream(System.out));
 		String current_line;				
 		while((current_line = br.readLine()) != null){
 			buffer += current_line;
@@ -166,13 +260,15 @@ public class Main {
 		}
 		buffer += END;
 		
-		process();
+		split();
+		printTokens();
 		br.close();
+		out.close();
 	}
 	
 
 
-	public class Token{
+	public static class Token{
 		int r, c;
 		String token, lexema;
 		
@@ -189,23 +285,32 @@ public class Main {
 			this.lexema = lexema;
 		}
 		
+		public void addChar(char c){
+			this.lexema += c;
+		}
+		
 		public Token() {
 			this.r = 0;
 			this.c = 0;
 			this.lexema = "";
+			this.token = "";
+		}
+		
+		public void fixCase(){
+			this.lexema = this.lexema.toLowerCase();
 		}
 		
 		@Override
 		public String toString() {
 			StringBuilder s = new StringBuilder("<");
-			if(!token.equals("")) s.append( token + "," );
+			if(!token.equals(""))s.append( token + "," );
 			if(!lexema.equals("")) s.append( lexema + "," );
 			s.append(r).append(" ").append(c).append(">\n");
 			return s.toString();
 		}
 	}
 	
-	public class Error{
+	public static class Error{
 		int r,c;
 		
 		public Error() {
@@ -220,11 +325,13 @@ public class Main {
 		
 		@Override
 		public String toString() {
-			StringBuilder s = new StringBuilder(">>> Error lexico (linea: ");
+			StringBuilder s = new StringBuilder("");
 			if(this.r != 0){
-				s.append(this.r).append(", posicion: ").append(this.c).append(")\n");
+				s.append(">>> Error lexico (linea: ").append(this.r).append(", posicion: ").append(this.c).append(")\n");
+				return s.toString();
 			}
-			return s.toString();
+			else
+				return "no error";
 		}
 	}
 
