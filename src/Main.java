@@ -163,10 +163,21 @@ public class Main {
 				tkn.addChar(c);
 				c = buffer.charAt(p);
 			}
-			if(!reservedWords.contains(tkn.lexema) ) tkn.setToken("id");
+			if(!reservedWords.contains(tkn.lexema.toLowerCase() ) && !tokenName.containsKey(tkn.lexema.toLowerCase() ) ){
+				tkn.setToken("id");
+				tkn.setLexema(tkn.lexema.toLowerCase());
+				}
+			else if(tokenName.containsKey(tkn.lexema)){
+					tkn.setToken(tokenName.get(tkn.lexema.toLowerCase()));
+					tkn.setLexema("");
+				}
+			else if(reservedWords.contains(tkn.lexema.toLowerCase())){
+					tkn.setToken(tkn.lexema.toLowerCase());
+					tkn.setLexema("");
+			}	
 		}
 		else if( isDigit(c)){
-			if(c == '-' && !isDigit( buffer.charAt(p) ) ){
+			if(!isDigit( buffer.charAt(p) ) ){
 				tkn.setToken( tokenName.get(tkn.lexema) );
 				tkn.setLexema("");
 			}
