@@ -205,28 +205,33 @@ public class Main {
 		}
 		else if(isSymbol(c) ){
 			if( c == '\'' || c == '\"' ){
-				System.out.println("CADENA!");
-				
-				int i = p;
-				System.out.println(i);
-				while( buffer.charAt(i) != END && buffer.charAt(i) != '\'' && buffer.charAt(i) != '\"') i++;
-				if(buffer.charAt(i) == '\"' || buffer.charAt(i) == '\''){
-					while(buffer.charAt(p) != '\'' && buffer.charAt(p) != '\"' ){
+				int i = p+1;
+				while(buffer.charAt(i) != END && buffer.charAt(i) != '\'' && buffer.charAt(i) != '\"'){
+					i++;
+				}
+				if(buffer.charAt(i) == '\'' || buffer.charAt(i) == '\"'){
+					tkn.setToken("token_cadena");
+					p++;column++;
+					while(buffer.charAt(p) != '\'' && buffer.charAt(p) != '\"'){
 						tkn.addChar(buffer.charAt(p));
-						tkn.setToken("token_cadena");
 						p++;column++;
-					}										
+					}
+					p++;column++;
 				}
 				else{
-					error = new Error(row, column);
+					error = new Error(row,column);
 					failure = true;
-				}		
+				}
 			}
 			else{
 				String single = new String("");
 				String dob = new String("");
+
 				single += c;
-				dob +=(buffer.charAt(p) + buffer.charAt(p+1));
+				dob += c;
+				dob += buffer.charAt(p+1);
+/*				System.out.println("single = " + single);
+				System.out.println("double = " + dob);*/
 				
 				if(tokenName.containsKey(dob) ){
 					tkn.addChar(buffer.charAt(p));
@@ -334,7 +339,7 @@ public class Main {
 			StringBuilder s = new StringBuilder("<");
 			s.append( this.token + "," );
 			if(!this.lexema.equals("")) s.append( this.lexema + "," );
-			s.append(this.r).append(", ").append(this.c).append(">\n");
+			s.append(this.r).append(",").append(this.c).append(">\n");
 			return s.toString();
 		}
 	}
