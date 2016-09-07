@@ -5,7 +5,7 @@ public class Main {
 	
 	
 	static PrintWriter out;
-	static String buffer;
+	static String buffer = new String("");
 	static final Character END = new Character('\0');
 	
 	static ArrayList<Token> tokens;
@@ -13,7 +13,7 @@ public class Main {
 	static int row;
 	static int column;
 	static int p;
-	static Error error;
+	static Error error = new Error();
 	static boolean failure;
 	static TreeSet<String> reservedWords;
 	static HashMap<String, String> tokenName;
@@ -190,16 +190,28 @@ public class Main {
 					tkn.addChar(c);
 					c = buffer.charAt(p);
 				}
-				if(real) tkn.setToken("token_real");
-				else tkn.setToken("token_entero");
+				if(real){
+					tkn.setToken("token_real");
+					}
+				else if(isLetter(c) || c =='.' && real || (c == '.'&& !isDigit( buffer.charAt(p+1) ) ) ){
+					error = new Error(row,column);
+					failure = true;
+					tkn.setToken("");
+					tkn.setLexema("");
+				}
+				else
+					tkn.setToken("token_entero");
 			}
 		}
 		else if(isSymbol(c) ){
 			if( c == '\'' || c == '\"' ){
+				System.out.println("CADENA!");
+				
 				int i = p;
-				while( buffer.charAt(i) != END) i++;
+				System.out.println(i);
+				while( buffer.charAt(i) != END && buffer.charAt(i) != '\'' && buffer.charAt(i) != '\"') i++;
 				if(buffer.charAt(i) == '\"' || buffer.charAt(i) == '\''){
-					while(buffer.charAt(i) != '\'' && buffer.charAt(i) != '\"' ){
+					while(buffer.charAt(p) != '\'' && buffer.charAt(p) != '\"' ){
 						tkn.addChar(buffer.charAt(p));
 						tkn.setToken("token_cadena");
 						p++;column++;
@@ -211,27 +223,28 @@ public class Main {
 				}		
 			}
 			else{
-				String temp = "";
-				temp +=(c + buffer.charAt(p));
-				if(tokenName.containsKey(temp) ){
+				String single = new String("");
+				String dob = new String("");
+				single += c;
+				dob +=(buffer.charAt(p) + buffer.charAt(p+1));
+				
+				if(tokenName.containsKey(dob) ){
+					tkn.addChar(buffer.charAt(p));
+					tkn.addChar(buffer.charAt(p+1));
+					tkn.setToken(tokenName.get(tkn.lexema));
+					tkn.setLexema("");
+					p+=2;column+=2;
+				}
+				else if(tokenName.containsKey(single) ){
 					tkn.addChar(buffer.charAt(p));
 					tkn.setToken(tokenName.get(tkn.lexema));
 					tkn.setLexema("");
-					p++;c++;
-				}
-				else if(tokenName.containsKey(tkn.lexema) ){
-					tkn.setToken(tokenName.get(tkn.lexema));
-					tkn.setLexema("");
-				}
-				else{
-					error = new Error(row,column-1);
-					failure = true;
-				}
-				
+					p++; column++;
+				}				
 			}
 		}
 		else{
-			error = new Error(row, column-1);
+			error = new Error(row, column);
 			failure = true;
 		}
 		
@@ -240,7 +253,8 @@ public class Main {
 	
 	public static void printTokens(){
 		for(Token token: tokens){
-			out.println(token);
+			if(!token.token.equals("") || !token.lexema.equals(""))
+				out.print(token);
 		}
 		out.println(error);
 	}
@@ -264,7 +278,9 @@ public class Main {
 		
 		BufferedReader br = new BufferedReader(new FileReader("in.txt"));
 		out = new PrintWriter(new BufferedOutputStream(System.out));
-		String current_line;				
+		
+		String current_line = new String("");
+		
 		while((current_line = br.readLine()) != null){
 			buffer += current_line;
 			buffer += "\n";
@@ -286,6 +302,8 @@ public class Main {
 		public Token(int fila, int columna) {
 			this.r= fila;
 			this.c= columna;
+			this.token = new String("");
+			this.lexema = new String("");
 		}
 		
 		public void setToken(String token) {
@@ -314,9 +332,9 @@ public class Main {
 		@Override
 		public String toString() {
 			StringBuilder s = new StringBuilder("<");
-			if(!token.equals(""))s.append( token + "," );
-			if(!lexema.equals("")) s.append( lexema + "," );
-			s.append(r).append(" ").append(c).append(">\n");
+			s.append( this.token + "," );
+			if(!this.lexema.equals("")) s.append( this.lexema + "," );
+			s.append(this.r).append(", ").append(this.c).append(">\n");
 			return s.toString();
 		}
 	}
@@ -342,7 +360,7 @@ public class Main {
 				return s.toString();
 			}
 			else
-				return "no error";
+				return "";
 		}
 	}
 
