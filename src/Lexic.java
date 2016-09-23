@@ -1,7 +1,7 @@
 import java.util.*;
 import java.io.*;
 
-public class Main {
+public class Lexic {
 	
 	
 	static PrintWriter out;
@@ -115,7 +115,18 @@ public class Main {
 		reservedWords.add("otro");
 		reservedWords.add("modo");
 		reservedWords.add("subproceso");
-		reservedWords.add("finsubproceso");		
+		reservedWords.add("finsubproceso");
+		reservedWords.add("finsubalgoritmo");
+		reservedWords.add("subalgoritmo");
+		reservedWords.add("esperar");
+		reservedWords.add("tecla");
+		reservedWords.add("borrar");
+		reservedWords.add("pantalla");
+		reservedWords.add("segundos");
+		reservedWords.add("milisegundos");
+		reservedWords.add("funcion");
+		reservedWords.add("finfuncion");
+		reservedWords.add("caso");
 	}
 	
 	public static boolean ignoreComment(){
