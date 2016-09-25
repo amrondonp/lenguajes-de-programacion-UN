@@ -1,13 +1,13 @@
 import java.util.*;
 import java.io.*;
 
-public class Lexic {
-	
-	
+public class Parser {
+
+
 	static PrintWriter out;
 	static String buffer = new String("");
 	static final Character END = new Character('\0');
-	
+
 	static ArrayList<Token> tokens;
 	static TreeSet<Character> validSymbols;
 	static int row;
@@ -17,15 +17,17 @@ public class Lexic {
 	static boolean failure;
 	static TreeSet<String> reservedWords;
 	static HashMap<String, String> tokenName;
-	
-	
+	static ArrayList<String> grammar;
+	static Deque<String> derivation;
+
+
 	public static boolean  isLetter(char c){return ('a' <=c && c<= 'z')|| ( 'A' <= c && c <= 'Z' );}
 	public static boolean  isDigit( char c ) { return ( '0' <= c && c <= '9' ); }
 	public static boolean  isWhiteSpace( char c ) { return ( c == '\n' || c == ' ' || c == '\t' || c == '\r' ); }
-	public static boolean  isSymbol( char c ) { return validSymbols.contains(new Character(c));}	
+	public static boolean  isSymbol( char c ) { return validSymbols.contains(new Character(c));}
 	public static boolean  isValidCharacter( char c ) { return ( isLetter( c ) || isDigit( c ) || ( isWhiteSpace( c ) && c != '\n' ) || c == '_' ); }
-	
-	public static void init(){
+
+	public static void init() throws IOException{
 		tokenName = new HashMap<String, String>();
 		reservedWords = new TreeSet<String>();
 		validSymbols = new TreeSet<Character>();
@@ -56,11 +58,13 @@ public class Lexic {
 		tokenName.put("y", "token_y");
 		tokenName.put(",", "token_coma");
 		tokenName.put("^", "token_pot");
-		
+		tokenName.put("mod", "token_mod");
+
 		validSymbols.add(new Character('~'));
 		validSymbols.add(new Character('='));
 		validSymbols.add(new Character('-'));
 		validSymbols.add(new Character('*'));
+		validSymbols.add(new Character('+'));
 		validSymbols.add(new Character('/'));
 		validSymbols.add(new Character('<'));
 		validSymbols.add(new Character('>'));
@@ -78,7 +82,7 @@ public class Lexic {
 		validSymbols.add(new Character('^'));
 		validSymbols.add(new Character('&'));
 		validSymbols.add(new Character('|'));
-		
+
 		reservedWords.add("algoritmo");
 		reservedWords.add("proceso");
 		reservedWords.add("finproceso");
@@ -99,6 +103,17 @@ public class Lexic {
 		reservedWords.add("mientras");
 		reservedWords.add("hacer");
 		reservedWords.add("finmientras");
+		reservedWords.add("milisegundos");
+		reservedWords.add("segundos");
+		reservedWords.add("leer");
+		reservedWords.add("limpiar");
+		reservedWords.add("mod");
+		reservedWords.add("pantalla");
+		reservedWords.add("repetir");
+		reservedWords.add("funcion");
+		reservedWords.add("tecla");
+		reservedWords.add("escribir");
+		reservedWords.add("esperar");
 		reservedWords.add("hasta");
 		reservedWords.add("que");
 		reservedWords.add("para");
@@ -111,24 +126,27 @@ public class Lexic {
 		reservedWords.add("entonces");
 		reservedWords.add("segun");
 		reservedWords.add("finsegun");
+		reservedWords.add("finfuncion");
 		reservedWords.add("de");
 		reservedWords.add("otro");
 		reservedWords.add("modo");
 		reservedWords.add("subproceso");
 		reservedWords.add("finsubproceso");
+		reservedWords.add("borrar");
 		reservedWords.add("finsubalgoritmo");
 		reservedWords.add("subalgoritmo");
-		reservedWords.add("esperar");
-		reservedWords.add("tecla");
-		reservedWords.add("borrar");
-		reservedWords.add("pantalla");
-		reservedWords.add("segundos");
-		reservedWords.add("milisegundos");
-		reservedWords.add("funcion");
-		reservedWords.add("finfuncion");
 		reservedWords.add("caso");
+		
+		/*add grammar from grammar.txt*/
+		BufferedReader gr = new BufferedReader(new FileReader("grammar.txt"));
+		String current_rule = new String("");
+		while((current_rule = gr.readLine()) != null)
+			grammar.add(current_rule);
+		
+		gr.close();
+		
 	}
-	
+
 	public static boolean ignoreComment(){
 		boolean flag = false;
 		if(buffer.charAt(p) == '/' && buffer.charAt(p+1) == '/'){
@@ -139,20 +157,20 @@ public class Lexic {
 		}
 		return flag;
 	}
-	
+
 	public static boolean ignoreWhiteSpace(){
 		boolean flag = false;
 		while(isWhiteSpace(buffer.charAt(p))){
 			if(buffer.charAt(p) == '\n'){
 				row++; column = 1;
-			}			
+			}
 			else column++;
 			flag = true;
 			p++;
 		}
 		return flag;
 	}
-	
+
 	static void skip(){
 		boolean trash;
 		do{
@@ -162,11 +180,11 @@ public class Lexic {
 		}
 		while(trash);
 	}
-	
+
 	public static Token readToken(){
 		Token tkn = new Token(row,column);
 		char c = buffer.charAt(p);
-		
+
 		if( isLetter(c) ){
 			c = buffer.charAt(p);
 			while( isLetter(c) || isDigit(c) || c == '_'){
@@ -178,14 +196,14 @@ public class Lexic {
 				tkn.setToken("id");
 				tkn.setLexema(tkn.lexema.toLowerCase());
 				}
-			else if(tokenName.containsKey(tkn.lexema)){
+			else if(tokenName.containsKey(tkn.lexema.toLowerCase())){
 					tkn.setToken(tokenName.get(tkn.lexema.toLowerCase()));
 					tkn.setLexema("");
 				}
 			else if(reservedWords.contains(tkn.lexema.toLowerCase())){
 					tkn.setToken(tkn.lexema.toLowerCase());
 					tkn.setLexema("");
-			}	
+			}
 		}
 		else if( isDigit(c)){
 			if(!isDigit( buffer.charAt(p) ) ){
@@ -194,21 +212,32 @@ public class Lexic {
 			}
 			else{
 				c = buffer.charAt(p);
+				int i = 0;
 				boolean real = false;
 				while( isDigit(c) || (c == '.' && !real && isDigit(buffer.charAt(p+1) ) ) ){
 					p++;column++;
+					i++;
 					real |= (c == '.');
 					tkn.addChar(c);
 					c = buffer.charAt(p);
 				}
-				if(real){
-					tkn.setToken("token_real");
-					}
-				else if(isLetter(c) || c =='.' && real || (c == '.'&& !isDigit( buffer.charAt(p+1) ) ) ){
+				if( c == '.'&& !isDigit( buffer.charAt(p+1) ) ){
+					tkn.setToken("token_entero");
 					error = new Error(row,column);
 					failure = true;
+				}
+				else if(c =='.' && real){
+					error = new Error(row,column);
+					failure = true;
+				}
+				else if (real){
+					tkn.setToken("token_real");
+				}
+				else if(isLetter(c)){
+					error = new Error(row, column - i);
 					tkn.setToken("");
 					tkn.setLexema("");
+					failure = true;
 				}
 				else
 					tkn.setToken("token_entero");
@@ -243,7 +272,7 @@ public class Lexic {
 				dob += buffer.charAt(p+1);
 /*				System.out.println("single = " + single);
 				System.out.println("double = " + dob);*/
-				
+
 				if(tokenName.containsKey(dob) ){
 					tkn.addChar(buffer.charAt(p));
 					tkn.addChar(buffer.charAt(p+1));
@@ -256,17 +285,17 @@ public class Lexic {
 					tkn.setToken(tokenName.get(tkn.lexema));
 					tkn.setLexema("");
 					p++; column++;
-				}				
+				}
 			}
 		}
 		else{
 			error = new Error(row, column);
 			failure = true;
 		}
-		
+
 		return tkn;
 	}
-	
+
 	public static void printTokens(){
 		for(Token token: tokens){
 			if(!token.token.equals("") || !token.lexema.equals(""))
@@ -274,100 +303,130 @@ public class Lexic {
 		}
 		out.println(error);
 	}
-	
+
 	public static void split(){
 		p = 0;
 		row=column=1;
 		skip();
 		while(buffer.charAt(p) != END){
 			Token nextToken = readToken();
-			if(!failure) tokens.add(nextToken);
+			if(!failure || nextToken.token.equals("token_entero")) tokens.add(nextToken);
 			else break;
 			skip();
 		}
+
 	}
 	
-	public static void main(String[] args) throws IOException{
-		
-		init();
-		//BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		
-		BufferedReader br = new BufferedReader(new FileReader("in.txt"));
-		out = new PrintWriter(new BufferedOutputStream(System.out));
-		
+	public static void lexer() throws IOException{
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+		//  BufferedReader br = new BufferedReader(new FileReader("in.txt"));
 		String current_line = new String("");
-		
+
 		while((current_line = br.readLine()) != null){
 			buffer += current_line;
 			buffer += "\n";
 		}
 		buffer += END;
-		
-		split();
-		printTokens();
 		br.close();
-		out.close();
+		split();
+
+		//printTokens();
 	}
 	
+	public static void parser(){
+	
+		read_grammar();
+	}
+	
+	public static void read_grammar(){
+		boolean init_symbol = true;
+		for(String line: grammar){
+			String[] parts = line.split(" -> ");
+			classify_symbol(parts[0]);
+			if(init_symbol){
+				derivation.addLast(parts[0]);
+				
+			}
+		}
+	}
+
+	private static void classify_symbol(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+	public static void main(String[] args) throws IOException{
+
+		init();
+		lexer();
+
+		out.close();
+	}
+
 
 
 	public static class Token{
 		int r, c;
 		String token, lexema;
-		
+
 		public Token(int fila, int columna) {
 			this.r= fila;
 			this.c= columna;
 			this.token = new String("");
 			this.lexema = new String("");
 		}
-		
+
 		public void setToken(String token) {
 			this.token = token;
 		}
-		
+
 		public void setLexema(String lexema) {
 			this.lexema = lexema;
 		}
-		
+
 		public void addChar(char c){
 			this.lexema += c;
 		}
-		
+
 		public Token() {
 			this.r = 0;
 			this.c = 0;
 			this.lexema = "";
 			this.token = "";
 		}
-		
+
 		public void fixCase(){
 			this.lexema = this.lexema.toLowerCase();
 		}
-		
+
 		@Override
 		public String toString() {
 			StringBuilder s = new StringBuilder("<");
 			s.append( this.token + "," );
-			if(!this.lexema.equals("")) s.append( this.lexema + "," );
+			if(!this.lexema.equals("")){
+				 s.append( this.lexema + "," );
+			}
+			else if(this.token.equals("token_cadena") && this.lexema.equals("")){
+				s.append(",");
+			}
 			s.append(this.r).append(",").append(this.c).append(">\n");
 			return s.toString();
 		}
 	}
-	
+
 	public static class Error{
 		int r,c;
-		
+
 		public Error() {
 			this.r = 0;
 			this.c = 0;
 		}
-		
+
 		public Error(int r, int c){
 			this.r = r;
 			this.c = c;
 		}
-		
+
 		@Override
 		public String toString() {
 			StringBuilder s = new StringBuilder("");
