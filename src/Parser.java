@@ -249,14 +249,147 @@ public class Parser {
 		reservedWords.add("caso");
 		
 		/*add grammar from grammar.txt*/
-		BufferedReader gr = new BufferedReader(new FileReader("grammar.txt"));
+		/*BufferedReader gr = new BufferedReader(new FileReader("grammar.txt"));
 		String current_rule = new String("");
 		while((current_rule = gr.readLine()) != null)
 			grammar.add(current_rule);
+		gr.close();*/
+		
+		/*add grammar the hard way*/
+		grammar.add("PROGRAMA -> SUBPROCESO PROCESO SUBPROCESO token_eof");
+		grammar.add("SUBPROCESO -> INICIOSUBPROCESO VARIABLE_RETORNO id SUBPROCESO_ARG CUERPO FINSUBPROCESO SUBPROCESO ");
+		grammar.add("SUBPROCESO_ARG -> token_par_izq ARGUMENTO token_par_der");
+		grammar.add("SUBPROCESO_ARG -> epsilon");
+		grammar.add("INICIOSUBPROCESO -> subproceso");
+		grammar.add("INICIOSUBPROCESO -> subalgoritmo");
+		grammar.add("INICIOSUBPROCESO -> funcion");
+		grammar.add("FINSUBPROCESO -> finsubproceso");
+		grammar.add("FINSUBPROCESO -> finsubalgoritmo");
+		grammar.add("FINSUBPROCESO -> finfuncion");
+		grammar.add("SUBPROCESO -> epsilon");
+		grammar.add("VARIABLE_RETORNO -> id token_asig");
+		grammar.add("VARIABLE_RETORNO -> epsilon");
+		grammar.add("ARGUMENTO -> epsilon");
+		grammar.add("ARGUMENTO -> id LISTA");
+		grammar.add("LISTA -> token_coma id LISTA");
+		grammar.add("LISTA -> epsilon");
+		grammar.add("PROCESO -> INICIOPROCESO id CUERPO FINPROCESO");
+		grammar.add("INICIOPROCESO -> proceso");
+		grammar.add("INICIOPROCESO -> algoritmo");
+		grammar.add("FINPROCESO -> finproceso");
+		grammar.add("FINPROCESO -> finalgoritmo");
+		grammar.add("CUERPO -> DEFINICION CUERPO");
+		grammar.add("CUERPO -> ASIGNACION CUERPO");
+		grammar.add("CUERPO -> INSTRUCCION CUERPO");
+		grammar.add("CUERPO -> DIMENSION CUERPO");
+		grammar.add("CUERPO -> CONDICIONAL_SI CUERPO");
+		grammar.add("CUERPO -> CICLO_PARA CUERPO");
+		grammar.add("CUERPO -> CICLO_MIENTRAS CUERPO");
+		grammar.add("CUERPO -> CICLO_REPETIR CUERPO");
+		grammar.add("CUERPO -> SEGUN_HACER CUERPO");
+		grammar.add("CUERPO -> LLAMADO_SUB CUERPO");
+		grammar.add("LLAMADO_SUB -> id ARG_LLAMADO_PROCESO");
+		grammar.add("LLAMADO_ARR -> id ACCEDER_ARREGLO");
+		grammar.add("CUERPO -> epsilon");
+		grammar.add("DIMENSION -> dimension ARREGLO LISTA_ARREGLOS token_pyc");
+		grammar.add("ARREGLO -> id DIM");
+		grammar.add("DIM -> token_cor_izq EXPRESION LISTA_EXPR token_cor_der");
+		grammar.add("DIM -> token_par_izq EXPRESION LISTA_EXPR token_par_der");
+		grammar.add("LISTA_ARREGLOS -> token_coma ARREGLO LISTA_ARREGLOS");
+		grammar.add("LISTA_ARREGLOS -> epsilon");
+		grammar.add("DEFINICION -> definir id LISTA como TIPO token_pyc ");
+		grammar.add("ASIGNACION -> id token_asig ASIGNAR token_pyc ");
+		grammar.add("ASIGNACION -> LLAMADO_ARR token_asig ASIGNAR token_pyc");
+		grammar.add("ASIGNAR -> EXPRESION");
+		grammar.add("LISTA_EXPR -> token_coma EXPRESION LISTA_EXPR");
+		grammar.add("LISTA_EXPR -> epsilon");
+		grammar.add("EXPRESION -> TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTO -> token_y TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTO -> token_o TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTO -> EXPRESION_LOGICA");
+		grammar.add("EXPRESION_LOGICA -> token_igual TERMINO COMPLEMENTOS_ADICIONALES");
+		grammar.add("EXPRESION_LOGICA -> token_dif TERMINO COMPLEMENTOS_ADICIONALES");
+		grammar.add("EXPRESION_LOGICA -> token_menor TERMINO COMPLEMENTOS_ADICIONALES");
+		grammar.add("EXPRESION_LOGICA -> token_mayor TERMINO COMPLEMENTOS_ADICIONALES");
+		grammar.add("EXPRESION_LOGICA -> token_menor_igual TERMINO COMPLEMENTOS_ADICIONALES");
+		grammar.add("EXPRESION_LOGICA -> token_mayor_igual TERMINO COMPLEMENTOS_ADICIONALES");
+		grammar.add("EXPRESION_LOGICA -> EXPRESION_MAT");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_y TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_o TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_mas TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_menos TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_mul TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_mod TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_pot TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> token_div TERMINO COMPLEMENTO");
+		grammar.add("COMPLEMENTOS_ADICIONALES -> epsilon");
+		grammar.add("EXPRESION_MAT -> token_mas TERMINO COMPLEMENTO");
+		grammar.add("EXPRESION_MAT -> token_menos TERMINO COMPLEMENTO");
+		grammar.add("EXPRESION_MAT -> epsilon");
+		grammar.add("EXPRESION_MAT -> EXPRESION_MAT2");
+		grammar.add("EXPRESION_MAT2 -> token_mul TERMINO COMPLEMENTO");
+		grammar.add("EXPRESION_MAT2 -> token_mod TERMINO COMPLEMENTO");
+		grammar.add("EXPRESION_MAT2 -> token_pot TERMINO COMPLEMENTO");
+		grammar.add("EXPRESION_MAT2 -> token_div TERMINO COMPLEMENTO");
+		grammar.add("EXPRESION_MAT2 -> epsilon");
+		grammar.add("TERMINO -> token_par_izq EXPRESION token_par_der");
+		grammar.add("TERMINO -> CONSTANTE");
+		grammar.add("TERMINO -> ID_O_LLAMADO");
+		grammar.add("TERMINO -> token_menos CONSTANTE");
+		grammar.add("TERMINO -> token_mas CONSTANTE");
+		grammar.add("TERMINO -> token_neg CONSTANTE");
+		grammar.add("CONSTANTE -> token_entero");
+		grammar.add("CONSTANTE -> token_real");
+		grammar.add("CONSTANTE -> token_caracter");
+		grammar.add("CONSTANTE -> token_cadena");
+		grammar.add("CONSTANTE -> falso");
+		grammar.add("CONSTANTE -> verdadero");
+		grammar.add("TIPO -> caracter");
+		grammar.add("TIPO -> entero");
+		grammar.add("TIPO -> logico");
+		grammar.add("TIPO -> numero");
+		grammar.add("TIPO -> numerico");
+		grammar.add("TIPO -> real");
+		grammar.add("TIPO -> texto");
+		grammar.add("TIPO -> cadena");
+		grammar.add("INSTRUCCION -> esperar INS_ESPERAR token_pyc");
+		grammar.add("INSTRUCCION -> borrar pantalla token_pyc ");
+		grammar.add("INSTRUCCION -> escribir EXPRESION LISTA_EXPR token_pyc ");
+		grammar.add("INS_ESPERAR -> tecla ");
+		grammar.add("INSTRUCCION -> leer ID_O_LLAMADO LISTA_ID_O_LLAMADO token_pyc");
+		grammar.add("LISTA_ID_O_LLAMADO -> token_coma ID_O_LLAMADO LISTA_ID_O_LLAMADO");
+		grammar.add("LISTA_ID_O_LLAMADO -> epsilon");
+		grammar.add("INS_ESPERAR -> EXPRESION segundos  ");
+		grammar.add("CONDICIONAL_SI -> si EVALUAR_PAR entonces CUERPO SI_NO finsi");
+		grammar.add("EVALUAR_PAR -> token_par_izq EXPRESION token_par_der");
+		grammar.add("EVALUAR_PAR -> EXPRESION");
+		grammar.add("SI_NO -> sino CUERPO");
+		grammar.add("SI_NO -> epsilon");
+		grammar.add("CICLO_PARA -> para id token_asig EXPRESION hasta EXPRESION CON_PASO hacer CUERPO finpara");
+		grammar.add("CON_PASO -> EXPRESION");
+		grammar.add("CON_PASO -> epsilon");
+		grammar.add("CICLO_MIENTRAS -> mientras EXPRESION hacer CUERPO finmientras");
+		grammar.add("CICLO_REPETIR -> repetir CUERPO hasta que EXPRESION");
+		grammar.add("SEGUN_HACER -> segun EXPRESION hacer CASOS de otro modo token_dosp CUERPO finsegun");
+		grammar.add("CASOS -> CASO CASOS");
+		grammar.add("CASOS -> epsilon");
+		grammar.add("CASO -> caso EXPRESION token_dosp CUERPO");
+		grammar.add("ID_O_LLAMADO -> id COMPLEMENTO_ID_O_LLAMADO");
+		grammar.add("COMPLEMENTO_ID_O_LLAMADO -> ACCEDER_ARREGLO");
+		grammar.add("COMPLEMENTO_ID_O_LLAMADO -> LLAMADO_PROCESO");
+		grammar.add("COMPLEMENTO_ID_O_LLAMADO -> epsilon");
+		grammar.add("LLAMADO_PROCESO -> ARG_LLAMADO_PROCESO");
+		grammar.add("ARG_LLAMADO_PROCESO -> token_par_izq ARG_LLAMADO token_par_der");
+		grammar.add("ARG_LLAMADO_PROCESO -> epsilon");
+		grammar.add("ARG_LLAMADO -> EXPRESION LISTA_ARG_LLAMADO");
+		grammar.add("LISTA_ARG_LLAMADO -> token_coma EXPRESION LISTA_ARG_LLAMADO");
+		grammar.add("LISTA_ARG_LLAMADO -> epsilon");
+		grammar.add("ACCEDER_ARREGLO -> INDEX ");
+		grammar.add("INDEX -> token_cor_izq LISTA_EXPR token_cor_der");
+
 		
 		
 		
-		gr.close();
 		
 	}
 
@@ -457,7 +590,7 @@ public class Parser {
 		//System.out.println(follows);
 		//System.out.println(predictions);
 		
-		System.out.println(tokens);
+		//System.out.println(tokens);
 		//System.out.println(derivation);
 		token = get_next_token();
 		replace_in_derivation();
@@ -662,7 +795,7 @@ public class Parser {
 	public static void replace_in_derivation() throws IOException{
 		while(!derivation.isEmpty()){
 			String current_symbol = derivation.getFirst();
-			//System.out.println(derivation);
+			//System.out.println(current_symbol);
 			if(current_symbol.equals(EPS) || terminals.contains(current_symbol)){
 				match();
 				continue;

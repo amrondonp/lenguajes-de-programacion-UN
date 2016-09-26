@@ -1,4 +1,4 @@
-proceso mi_proceso
-    Definir a como entero;
-    Escribir a1/10;
-//Comentario al final
+SubProceso f <- triple ( x )
+    Definir f Como numero;
+    f <- x*3;
+FinSubProceso
