@@ -1,3 +1,8 @@
+/*
+ * Integrantes:
+ * Angela maria Munoz Medina
+ * Nicolas Larranaga Cifuentes*/
+
 import java.util.*;
 import java.io.*;
 
@@ -24,7 +29,7 @@ public class Parser {
 	static HashMap<String, TreeSet<String>> first, follows;
 	static HashMap<String, ArrayList<TreeSet<String>>> predictions;
 	static HashMap<String, Pair<Integer, String>> token_symbol;
-	static HashMap<String, Pair<Integer, String>> token_symbol_alt;
+
 	static HashMap<String, ArrayList< ArrayList< String>>> rules;
 	
 	static TreeSet<String> terminals, nonTerminals;
@@ -49,7 +54,7 @@ public class Parser {
 		derivation = new ArrayDeque<String>();
 		predictions = new HashMap<String, ArrayList< TreeSet<String>>>();
 		token_symbol = new HashMap<String, Pair<Integer, String>>();
-		token_symbol_alt = new HashMap<String, Pair<Integer, String>>();
+
 		rules = new HashMap<String, ArrayList<ArrayList< String>>>();
 		terminals= new TreeSet<String>();
 		nonTerminals = new TreeSet<String>();
@@ -81,6 +86,7 @@ public class Parser {
 		tokenName.put("~", "token_neg");
 		tokenName.put("no", "token_neg");
 		tokenName.put("=", "token_igual");
+		tokenName.put("==", "token_igual");
 		tokenName.put("<-", "token_asig");
 		tokenName.put("<>", "token_dif");
 		tokenName.put("<", "token_menor");
@@ -106,23 +112,93 @@ public class Parser {
 		tokenName.put("^", "token_pot");
 		tokenName.put("mod", "token_mod");
 		
-		token_symbol.put("token_neg", new Pair<Integer,String>( Integer.valueOf(0), "~")  );
-		token_symbol.put("token_neg", new Pair<Integer,String>( Integer.valueOf(1), "no")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
-		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("algoritmo", new Pair<Integer,String>( Integer.valueOf(0), "algoritmo")  );
+		token_symbol.put("borrar", new Pair<Integer,String>( Integer.valueOf(1), "borrar")  );
+		token_symbol.put("cadena", new Pair<Integer,String>( Integer.valueOf(2), "cadena")  );
+		token_symbol.put("caracter", new Pair<Integer,String>( Integer.valueOf(3), "caracter")  );
+		token_symbol.put("caso", new Pair<Integer,String>( Integer.valueOf(4), "caso")  );
+		token_symbol.put("como", new Pair<Integer,String>( Integer.valueOf(5), "como")  );
+		token_symbol.put("con", new Pair<Integer,String>( Integer.valueOf(6), "con")  );
+		token_symbol.put("de", new Pair<Integer,String>( Integer.valueOf(7), "de")  );
+		token_symbol.put("definir", new Pair<Integer,String>( Integer.valueOf(8), "definir")  );
+		token_symbol.put("dimension", new Pair<Integer,String>( Integer.valueOf(9), "dimension")  );
+		token_symbol.put("entero", new Pair<Integer,String>( Integer.valueOf(10), "entero")  );
+		token_symbol.put("entonces", new Pair<Integer,String>( Integer.valueOf(11), "entonces")  );
+		token_symbol.put("escribir", new Pair<Integer,String>( Integer.valueOf(12), "escribir")  );
+		token_symbol.put("esperar", new Pair<Integer,String>( Integer.valueOf(13), "esperar")  );
+		token_symbol.put("falso", new Pair<Integer,String>( Integer.valueOf(14), "falso")  );
+		token_symbol.put("finalgoritmo", new Pair<Integer,String>( Integer.valueOf(15), "finalgoritmo")  );
+		token_symbol.put("finfuncion", new Pair<Integer,String>( Integer.valueOf(16), "finfuncion")  );
+		token_symbol.put("finmientras", new Pair<Integer,String>( Integer.valueOf(17), "finmientras")  );
+		token_symbol.put("finpara", new Pair<Integer,String>( Integer.valueOf(18), "finpara")  );
+		token_symbol.put("finproceso", new Pair<Integer,String>( Integer.valueOf(19), "finproceso")  );
+		token_symbol.put("finsegun", new Pair<Integer,String>( Integer.valueOf(21), "finsegun")  );
+		token_symbol.put("finsi", new Pair<Integer,String>( Integer.valueOf(22), "finsi")  );
+		token_symbol.put("finsubproceso", new Pair<Integer,String>( Integer.valueOf(23), "finsubproceso")  );
+		token_symbol.put("funcion", new Pair<Integer,String>( Integer.valueOf(24), "funcion")  );
+		token_symbol.put("hacer", new Pair<Integer,String>( Integer.valueOf(25), "hacer")  );
+		token_symbol.put("hasta", new Pair<Integer,String>( Integer.valueOf(26), "hasta")  );
+		token_symbol.put("id", new Pair<Integer,String>( Integer.valueOf(27), "identificador")  );
+		token_symbol.put("leer", new Pair<Integer,String>( Integer.valueOf(28), "leer")  );
+		token_symbol.put("limpiar", new Pair<Integer,String>( Integer.valueOf(29), "limpiar")  );
+		token_symbol.put("logico", new Pair<Integer,String>( Integer.valueOf(30), "logico")  );
+		token_symbol.put("mientras", new Pair<Integer,String>( Integer.valueOf(31), "mientras")  );
+		token_symbol.put("milisegundos", new Pair<Integer,String>( Integer.valueOf(32), "milisegundos")  );
+		token_symbol.put("modo", new Pair<Integer,String>( Integer.valueOf(33), "modo")  );
+		token_symbol.put("numerico", new Pair<Integer,String>( Integer.valueOf(34), "numerico")  );
+		token_symbol.put("numero", new Pair<Integer,String>( Integer.valueOf(35), "numero")  );
+		token_symbol.put("otro", new Pair<Integer,String>( Integer.valueOf(36), "otro")  );
+		token_symbol.put("pantalla", new Pair<Integer,String>( Integer.valueOf(37), "pantalla")  );
+		token_symbol.put("para", new Pair<Integer,String>( Integer.valueOf(38), "para")  );
+		token_symbol.put("paso", new Pair<Integer,String>( Integer.valueOf(39), "paso")  );
+		token_symbol.put("proceso", new Pair<Integer,String>( Integer.valueOf(40), "proceso")  );
+		token_symbol.put("que", new Pair<Integer,String>( Integer.valueOf(41), "que")  );
+		token_symbol.put("real", new Pair<Integer,String>( Integer.valueOf(42), "real")  );
+		token_symbol.put("repetir", new Pair<Integer,String>( Integer.valueOf(43), "repetir")  );
+		token_symbol.put("segun", new Pair<Integer,String>( Integer.valueOf(44), "segun")  );
+		token_symbol.put("segundos", new Pair<Integer,String>( Integer.valueOf(45), "segundos")  );
+		token_symbol.put("si", new Pair<Integer,String>( Integer.valueOf(46), "si")  );
+		token_symbol.put("sino", new Pair<Integer,String>( Integer.valueOf(47), "sino")  );
+		token_symbol.put("subproceso", new Pair<Integer,String>( Integer.valueOf(48), "subproceso")  );
+		token_symbol.put("tecla", new Pair<Integer,String>( Integer.valueOf(49), "tecla")  );
+		token_symbol.put("texto", new Pair<Integer,String>( Integer.valueOf(50), "texto")  );
+		token_symbol.put("token_asig", new Pair<Integer,String>( Integer.valueOf(51), "<-")  );
+		token_symbol.put("token_cadena", new Pair<Integer,String>( Integer.valueOf(52), "valor_cadena")  );
+		token_symbol.put("token_coma", new Pair<Integer,String>( Integer.valueOf(53), ",")  );
+		token_symbol.put("token_cor_der", new Pair<Integer,String>( Integer.valueOf(54), "]")  );
+		token_symbol.put("token_cor_izq", new Pair<Integer,String>( Integer.valueOf(55), "[")  );
+		token_symbol.put("token_dif", new Pair<Integer,String>( Integer.valueOf(56), "<>")  );
+		token_symbol.put("token_div", new Pair<Integer,String>( Integer.valueOf(57), "/")  );
+		token_symbol.put("token_dosp", new Pair<Integer,String>( Integer.valueOf(58), ":")  );
+		token_symbol.put("token_entero", new Pair<Integer,String>( Integer.valueOf(59), "valor_entero")  );
+		token_symbol.put("token_igual", new Pair<Integer,String>( Integer.valueOf(60), "=")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(61), "+")  );
+		token_symbol.put("token_mayor", new Pair<Integer,String>( Integer.valueOf(62), ">")  );
+		token_symbol.put("token_mayor_igual", new Pair<Integer,String>( Integer.valueOf(63), ">=")  );
+		token_symbol.put("token_menor", new Pair<Integer,String>( Integer.valueOf(64), "<")  );
+		token_symbol.put("token_menor_igual", new Pair<Integer,String>( Integer.valueOf(65), "<=")  );
+		token_symbol.put("token_menos", new Pair<Integer,String>( Integer.valueOf(66), "-")  );
+		token_symbol.put("token_mod", new Pair<Integer,String>( Integer.valueOf(67), "%")  );
+		token_symbol.put("token_mul", new Pair<Integer,String>( Integer.valueOf(68), "*")  );
+		token_symbol.put("token_neg", new Pair<Integer,String>( Integer.valueOf(69), "~")  );
+		token_symbol.put("token_o", new Pair<Integer,String>( Integer.valueOf(70), "|")  );
+		token_symbol.put("token_par_der", new Pair<Integer,String>( Integer.valueOf(71), ")")  );
+		token_symbol.put("token_par_izq", new Pair<Integer,String>( Integer.valueOf(72), "(")  );
+		token_symbol.put("token_pot", new Pair<Integer,String>( Integer.valueOf(73), "^")  );
+		token_symbol.put("token_pyc", new Pair<Integer,String>( Integer.valueOf(74), ";")  );
+		token_symbol.put("token_real", new Pair<Integer,String>( Integer.valueOf(75), "valor_real")  );
+		token_symbol.put("token_y", new Pair<Integer,String>( Integer.valueOf(76), "&")  );
+		token_symbol.put("verdadero", new Pair<Integer,String>( Integer.valueOf(77), "verdadero")  );
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 
 		
@@ -385,6 +461,12 @@ public class Parser {
 		compute_follows();
 		compute_predictions();
 		
+		//System.out.println(first);
+		//System.out.println(follows);
+		//System.out.println(predictions);
+		
+		//System.out.println(tokens);
+		System.out.println(derivation);
 		token = get_next_token();
 		replace_in_derivation();
 	}
@@ -537,24 +619,15 @@ public class Parser {
 			String[] right = parts[1].split(" ");
 			for(String x : right){
 				currRule.add(x);
-				//System.out.println(x);
 				classify_symbol(x);
 			}
 			if( !currRule.get(currRule.size()-1 ).equals(EPS) )
 				currRule.add(EPS);
 			if(!rules.containsKey(parts[0]))
 				rules.put(parts[0], new ArrayList<ArrayList<String>>() );
-			//System.out.println("PRE "+parts[0] + " " + rules.get(parts[0]).toString());
-			//System.out.println(currRule);		
 			rules.get(parts[0]).add(currRule);
-			//System.out.println("POST "+parts[0] + " " + rules.get(parts[0]).toString());
+
 		}
-		/*for(String r: rules.keySet()){
-			System.out.println(r + " " +  rules.get(r).toString());
-		}*/
-		/*System.out.println(terminals.toString());
-		System.out.println(nonTerminals.toString());*/
-		//System.out.println(rules.toString());
 	}
 
 	private static void classify_symbol(String current) {
@@ -628,8 +701,6 @@ public class Parser {
 		for(String e: expected_tokens)
 			if(token_symbol.containsKey(e))
 				sorted_expected_tokens.add(token_symbol.get(e));
-			else if(token_symbol_alt.containsKey(e))
-				sorted_expected_tokens.add(token_symbol_alt.get(e));
 		if(sorted_expected_tokens.size() == 0){
 			out.println("El analisis sintactico ha finalizado exitosamente.");
 			System.exit(0);
