@@ -82,6 +82,7 @@ public class Parser {
 		validSymbols.add(new Character('^'));
 		validSymbols.add(new Character('&'));
 		validSymbols.add(new Character('|'));
+		validSymbols.add(new Character('$'));
 		
 		tokenName.put("~", "token_neg");
 		tokenName.put("no", "token_neg");
@@ -111,6 +112,7 @@ public class Parser {
 		tokenName.put(",", "token_coma");
 		tokenName.put("^", "token_pot");
 		tokenName.put("mod", "token_mod");
+		tokenName.put("$", "token_eof");
 		
 		token_symbol.put("algoritmo", new Pair<Integer,String>( Integer.valueOf(0), "algoritmo")  );
 		token_symbol.put("borrar", new Pair<Integer,String>( Integer.valueOf(1), "borrar")  );
@@ -189,18 +191,7 @@ public class Parser {
 		token_symbol.put("token_real", new Pair<Integer,String>( Integer.valueOf(75), "valor_real")  );
 		token_symbol.put("token_y", new Pair<Integer,String>( Integer.valueOf(76), "&")  );
 		token_symbol.put("verdadero", new Pair<Integer,String>( Integer.valueOf(77), "verdadero")  );
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-
+		token_symbol.put("token_eof", new Pair<Integer,String>( Integer.valueOf(78), "EOF")  );
 		
 
 		reservedWords.add("algoritmo");
@@ -448,13 +439,14 @@ public class Parser {
 			buffer += current_line;
 			buffer += "\n";
 		}
+		buffer += "$";
 		buffer += END;
 		split();
 
 		//printTokens();
 	}
 	
-	public static void parser(){
+	public static void parser() throws IOException{
 	
 		read_grammar();
 		compute_firsts();
@@ -465,8 +457,8 @@ public class Parser {
 		//System.out.println(follows);
 		//System.out.println(predictions);
 		
-		//System.out.println(tokens);
-		System.out.println(derivation);
+		System.out.println(tokens);
+		//System.out.println(derivation);
 		token = get_next_token();
 		replace_in_derivation();
 	}
@@ -637,9 +629,11 @@ public class Parser {
 			nonTerminals.add(current);
 	}
 	
-	private static void match(){
+	public static void match() throws IOException{
 		if(derivation.isEmpty()){
 			out.println("No se puede hacer emparejamiento");
+			out.close();
+			br.close();
 			System.exit(0);
 		}
 		String expected_token = derivation.removeFirst();
@@ -654,18 +648,21 @@ public class Parser {
 		}
 		else{
 			StringBuilder s = new StringBuilder("");
-			s.append("<").append(token.r).append(token.c).append("> ");
-			s.append("Error sintactico: se encontro: \"").append(token.lexema).append("\"; ");
+			s.append("<").append(token.r).append(":").append(token.c).append("> ");
+			s.append("Error sintactico: se encontro: \"").append(token_symbol.get(token.getValue()).second).append("\"; ");
 			s.append("se esperaba: ");
 			s.append("\"").append(expected_token).append("\".");
 			out.println(s.toString());
 		}
+		out.close();
+		br.close();
 		System.exit(0);			
 	}
 	
-	public static void replace_in_derivation(){
+	public static void replace_in_derivation() throws IOException{
 		while(!derivation.isEmpty()){
 			String current_symbol = derivation.getFirst();
+			//System.out.println(derivation);
 			if(current_symbol.equals(EPS) || terminals.contains(current_symbol)){
 				match();
 				continue;
@@ -701,8 +698,11 @@ public class Parser {
 		for(String e: expected_tokens)
 			if(token_symbol.containsKey(e))
 				sorted_expected_tokens.add(token_symbol.get(e));
+		
 		if(sorted_expected_tokens.size() == 0){
 			out.println("El analisis sintactico ha finalizado exitosamente.");
+			out.close();
+			br.close();
 			System.exit(0);
 		}
 		if(expected_tokens.contains("proceso")){
@@ -710,8 +710,10 @@ public class Parser {
 		}
 		else{
 			StringBuilder s = new StringBuilder("");
-			s.append("<").append(token.r).append(",").append(token.c).append("> ");
-			s.append("Error sintactico: se encontro: \"").append(token.lexema).append("\"; ");
+			s.append("<").append(token.r).append(":").append(token.c).append("> ");
+			s.append("Error sintactico: se encontro: \"");
+			s.append(token_symbol.get(token.getValue()).second);
+			s.append("\"; ");
 			s.append("se esperaba: ");
 			for(Pair<Integer,String> e: sorted_expected_tokens)		
 				s.append("\"").append(e.second).append("\", ");
@@ -719,15 +721,15 @@ public class Parser {
 			s.append(".");
 			out.println(s.toString());
 		}
+		br.close();
+		out.close();
 		System.exit(0);
 	}
 	
-
-
 	public static void main(String[] args) throws IOException{
 		//br = new BufferedReader(new InputStreamReader(System.in));
 		br = new BufferedReader(new FileReader("in.txt"));
-		out = new PrintWriter(new BufferedOutputStream(System.out));
+		out = new PrintWriter(System.out);
 		init();
 		lexer();
 		parser();
@@ -735,8 +737,6 @@ public class Parser {
 		out.close();
 		br.close();
 	}
-
-
 
 	public static class Token{
 		int r, c;
@@ -781,7 +781,7 @@ public class Parser {
 		}
 		
 		public String getValue(){
-			if(this.token != "")
+			if(!this.token.equals(""))
 				return this.token;
 			return this.lexema;
 		}
@@ -825,7 +825,7 @@ public class Parser {
 				return "";
 		}
 	}
-	public static class Pair<A, B> {
+	public static class Pair<A extends Comparable<? super A>, B extends Comparable<? super B>> implements Comparable<Pair<A,B>>{
 	    private A first;
 	    private B second;
 
@@ -877,6 +877,13 @@ public class Parser {
 	    public void setSecond(B second) {
 	    	this.second = second;
 	    }
+
+		@Override
+		public int compareTo(Pair o) {
+			int result = this.first.compareTo((A) o.first);
+			return (result == 0 ? this.second.compareTo((B) o.second): result);
+			
+		}
 	}
 
 }
