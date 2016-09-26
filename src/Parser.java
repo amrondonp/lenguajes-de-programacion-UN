@@ -3,12 +3,14 @@ import java.io.*;
 
 public class Parser {
 
-
+	static BufferedReader br;
 	static PrintWriter out;
 	static String buffer = new String("");
 	static final Character END = new Character('\0');
+	static final Token TOKEN_EOF = new Token("EOF");
+	static final String EPS = new String("epsilon");
 
-	static ArrayList<Token> tokens;
+	static Deque<Token> tokens;
 	static TreeSet<Character> validSymbols;
 	static int row;
 	static int column;
@@ -19,6 +21,14 @@ public class Parser {
 	static HashMap<String, String> tokenName;
 	static ArrayList<String> grammar;
 	static Deque<String> derivation;
+	static HashMap<String, TreeSet<String>> first, follows;
+	static HashMap<String, ArrayList<TreeSet<String>>> predictions;
+	static HashMap<String, Pair<Integer, String>> token_symbol;
+	static HashMap<String, Pair<Integer, String>> token_symbol_alt;
+	static HashMap<String, ArrayList< ArrayList< String>>> rules;
+	
+	static TreeSet<String> terminals, nonTerminals;
+	static Token token;
 
 
 	public static boolean  isLetter(char c){return ('a' <=c && c<= 'z')|| ( 'A' <= c && c <= 'Z' );}
@@ -28,10 +38,46 @@ public class Parser {
 	public static boolean  isValidCharacter( char c ) { return ( isLetter( c ) || isDigit( c ) || ( isWhiteSpace( c ) && c != '\n' ) || c == '_' ); }
 
 	public static void init() throws IOException{
+		token = new Token();
+		
+		first = new HashMap<String, TreeSet<String>>();
+		follows = new HashMap<String, TreeSet<String>>();
 		tokenName = new HashMap<String, String>();
 		reservedWords = new TreeSet<String>();
 		validSymbols = new TreeSet<Character>();
-		tokens = new ArrayList<Token>();
+		grammar = new ArrayList<String>();
+		derivation = new ArrayDeque<String>();
+		predictions = new HashMap<String, ArrayList< TreeSet<String>>>();
+		token_symbol = new HashMap<String, Pair<Integer, String>>();
+		token_symbol_alt = new HashMap<String, Pair<Integer, String>>();
+		rules = new HashMap<String, ArrayList<ArrayList< String>>>();
+		terminals= new TreeSet<String>();
+		nonTerminals = new TreeSet<String>();
+		tokens = new ArrayDeque<Token>();
+		
+		validSymbols.add(new Character('~'));
+		validSymbols.add(new Character('='));
+		validSymbols.add(new Character('-'));
+		validSymbols.add(new Character('*'));
+		validSymbols.add(new Character('+'));
+		validSymbols.add(new Character('/'));
+		validSymbols.add(new Character('<'));
+		validSymbols.add(new Character('>'));
+		validSymbols.add(new Character('%'));
+		validSymbols.add(new Character(':'));
+		validSymbols.add(new Character('\"'));
+		validSymbols.add(new Character('\''));
+		validSymbols.add(new Character(':'));
+		validSymbols.add(new Character(';'));
+		validSymbols.add(new Character(','));
+		validSymbols.add(new Character('['));
+		validSymbols.add(new Character(']'));
+		validSymbols.add(new Character('('));
+		validSymbols.add(new Character(')'));
+		validSymbols.add(new Character('^'));
+		validSymbols.add(new Character('&'));
+		validSymbols.add(new Character('|'));
+		
 		tokenName.put("~", "token_neg");
 		tokenName.put("no", "token_neg");
 		tokenName.put("=", "token_igual");
@@ -59,29 +105,27 @@ public class Parser {
 		tokenName.put(",", "token_coma");
 		tokenName.put("^", "token_pot");
 		tokenName.put("mod", "token_mod");
+		
+		token_symbol.put("token_neg", new Pair<Integer,String>( Integer.valueOf(0), "~")  );
+		token_symbol.put("token_neg", new Pair<Integer,String>( Integer.valueOf(1), "no")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		token_symbol.put("token_mas", new Pair<Integer,String>( Integer.valueOf(0), "+")  );
+		
 
-		validSymbols.add(new Character('~'));
-		validSymbols.add(new Character('='));
-		validSymbols.add(new Character('-'));
-		validSymbols.add(new Character('*'));
-		validSymbols.add(new Character('+'));
-		validSymbols.add(new Character('/'));
-		validSymbols.add(new Character('<'));
-		validSymbols.add(new Character('>'));
-		validSymbols.add(new Character('%'));
-		validSymbols.add(new Character(':'));
-		validSymbols.add(new Character('\"'));
-		validSymbols.add(new Character('\''));
-		validSymbols.add(new Character(':'));
-		validSymbols.add(new Character(';'));
-		validSymbols.add(new Character(','));
-		validSymbols.add(new Character('['));
-		validSymbols.add(new Character(']'));
-		validSymbols.add(new Character('('));
-		validSymbols.add(new Character(')'));
-		validSymbols.add(new Character('^'));
-		validSymbols.add(new Character('&'));
-		validSymbols.add(new Character('|'));
+		
 
 		reservedWords.add("algoritmo");
 		reservedWords.add("proceso");
@@ -142,6 +186,8 @@ public class Parser {
 		String current_rule = new String("");
 		while((current_rule = gr.readLine()) != null)
 			grammar.add(current_rule);
+		
+		
 		
 		gr.close();
 		
@@ -281,6 +327,7 @@ public class Parser {
 					p+=2;column+=2;
 				}
 				else if(tokenName.containsKey(single) ){
+					
 					tkn.addChar(buffer.charAt(p));
 					tkn.setToken(tokenName.get(tkn.lexema));
 					tkn.setLexema("");
@@ -310,7 +357,7 @@ public class Parser {
 		skip();
 		while(buffer.charAt(p) != END){
 			Token nextToken = readToken();
-			if(!failure || nextToken.token.equals("token_entero")) tokens.add(nextToken);
+			if(!failure || nextToken.token.equals("token_entero")) tokens.addLast(nextToken);
 			else break;
 			skip();
 		}
@@ -318,9 +365,7 @@ public class Parser {
 	}
 	
 	public static void lexer() throws IOException{
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-		//  BufferedReader br = new BufferedReader(new FileReader("in.txt"));
+		
 		String current_line = new String("");
 
 		while((current_line = br.readLine()) != null){
@@ -328,7 +373,6 @@ public class Parser {
 			buffer += "\n";
 		}
 		buffer += END;
-		br.close();
 		split();
 
 		//printTokens();
@@ -337,30 +381,262 @@ public class Parser {
 	public static void parser(){
 	
 		read_grammar();
+		compute_firsts();
+		compute_follows();
+		compute_predictions();
+		
+		token = get_next_token();
+		replace_in_derivation();
 	}
 	
+	private static Token get_next_token() {
+		Token ret = TOKEN_EOF;
+		ret.r = row; ret.c = column;
+		if(!tokens.isEmpty())
+			ret = tokens.removeFirst();
+		return ret;
+	}
+	private static void compute_firsts() {
+		boolean changed;
+		do{
+			changed = false;
+			for(String non_terminal : nonTerminals){
+				for(ArrayList<String> rule: rules.get(non_terminal)){
+					changed |= add_first_from(first.get(non_terminal), rule, 0);
+				}
+			}
+		}
+		while(changed);
+	}
+	
+	private static void compute_follows() {
+		boolean changed;
+		do{
+			changed = false;
+			for(String non_terminal_1: nonTerminals){
+				for(String non_terminal_2: nonTerminals){
+					for(ArrayList<String> rule: rules.get(non_terminal_2)){
+						for(int i = 0; i < rule.size(); i++){
+							if(rule.get(i).equals( non_terminal_1))
+								changed |= add_follows_from(follows.get(non_terminal_1), non_terminal_2, rule, i+1);
+						}
+					}
+				}
+			}
+		}
+		while(changed);
+	}
+	
+	private static void compute_predictions(){
+		for(String non_terminal : nonTerminals){
+			for(ArrayList<String> rule: rules.get(non_terminal)){
+				TreeSet<String> current_firsts = compute_firsts_from(rule, 0);
+				TreeSet<String> current_predictions = new TreeSet<String>();
+				boolean contains_eps = current_firsts.contains(EPS);
+				add_symbols_of(current_predictions, current_firsts, false);
+				if(contains_eps)
+					add_symbols_of(current_predictions, follows.get(non_terminal), false);
+				predictions.get(non_terminal).add(current_predictions);
+			}
+		}
+		
+	}
+	
+	private static boolean add_follows_from(TreeSet<String> follows_non_terminal, String non_terminal, ArrayList<String> rule, int from){
+		boolean changed = false;
+		TreeSet<String> new_firsts = compute_firsts_from(rule, from);
+		boolean contains_eps = new_firsts.contains(EPS);
+		changed |= add_symbols_of(follows_non_terminal, new_firsts, false);
+		if(contains_eps)
+			changed |= add_symbols_of(follows_non_terminal, follows.get(non_terminal), false );
+		return changed;
+	}
+	
+	private static boolean add_first_from(TreeSet<String> firsts_non_terminal, ArrayList<String> rule, int from){
+		boolean changed = false;
+		TreeSet<String> new_firsts = compute_firsts_from(rule, from);
+		changed |= add_symbols_of(firsts_non_terminal, new_firsts, true);
+		return changed;
+		
+	}
+
+	private static TreeSet<String> compute_firsts_from(ArrayList<String> rule, int from) {
+		TreeSet<String> new_firsts = new TreeSet<String>();
+		if(from +1 ==rule.size() && rule.get(from).equals(EPS)){
+			add_symbol(new_firsts, EPS);
+		}
+		else{
+			for(int i = from; i < rule.size(); i++ ){
+				if(terminals.contains(rule.get(i))){
+					add_symbol(new_firsts, rule.get(i));
+					break;
+				}
+				else{
+					boolean contains_eps = first.get(rule.get(i)).contains(EPS);
+					add_symbols_of(new_firsts, first.get(rule.get(i)), false );
+					if(contains_eps){
+						if(i+1 == rule.size())
+							add_symbol(new_firsts, EPS);
+					}
+					else
+						break;
+				}	
+			}
+		}
+		return new_firsts;
+	}
+	
+	private static boolean add_symbol(TreeSet<String> set_non_terminal, String symbol){
+		if( set_non_terminal.contains(symbol))
+			return false;
+		set_non_terminal.add(symbol);
+		return true;
+	}
+	
+	private static boolean add_symbols_of(TreeSet<String> set_non_terminal_1, TreeSet<String> set_non_terminal_2, boolean with_eps){
+		boolean changed = false;
+		for(String symbol: set_non_terminal_2){
+			if(!with_eps && symbol.equals( EPS))
+				continue;
+			changed |= add_symbol(set_non_terminal_1, symbol);
+		}
+		return changed;
+	}
+
 	public static void read_grammar(){
 		boolean init_symbol = true;
 		for(String line: grammar){
+			ArrayList<String> currRule = new ArrayList<String>();
 			String[] parts = line.split(" -> ");
 			classify_symbol(parts[0]);
 			if(init_symbol){
 				derivation.addLast(parts[0]);
-				
+				follows.put(parts[0], new TreeSet<String>());
+				follows.get(parts[0]).add(TOKEN_EOF.getValue());
+				init_symbol = false;
+			}
+			String[] right = parts[1].split(" ");
+			for(String x : right){
+				currRule.add(x);
+				//System.out.println(x);
+				classify_symbol(x);
+			}
+			if( currRule.get(currRule.size()-1 ) != EPS )
+				currRule.add(EPS);
+			rules.put(parts[0], new ArrayList<ArrayList<String>>() );
+			System.out.println(currRule);			
+			rules.get(parts[0]).add(currRule);
+		}
+		/*for(String r: rules.keySet()){
+			System.out.println(r + " " +  rules.get(r).toString());
+		}*/
+	}
+
+	private static void classify_symbol(String current) {
+		if('a' <= current.charAt(0) && current.charAt(0) <= 'z')
+			terminals.add(current);
+		else
+			nonTerminals.add(current);
+	}
+	
+	private static void match(){
+		if(derivation.isEmpty()){
+			out.println("No se puede hacer emparejamiento");
+			System.exit(0);
+		}
+		String expected_token = derivation.removeFirst();
+		if(expected_token.equals(EPS) || expected_token.equals(""))
+			return;
+		if(token.getValue().toLowerCase().equals(expected_token)){
+			token= get_next_token();
+			return;
+		}
+		if(expected_token.toLowerCase().equals("proceso")){
+			out.println("Error sintactico: falta proceso");
+		}
+		else{
+			StringBuilder s = new StringBuilder("");
+			s.append("<").append(token.r).append(token.c).append("> ");
+			s.append("Error sintactico: se encontro: \"").append(token.lexema).append("\"; ");
+			s.append("se esperaba: ");
+			s.append("\"").append(expected_token).append("\".");
+			out.println(s.toString());
+		}
+		System.exit(0);			
+	}
+	
+	public static void replace_in_derivation(){
+		while(!derivation.isEmpty()){
+			String current_symbol = derivation.getFirst();
+			if(current_symbol.equals(EPS) || terminals.contains(current_symbol)){
+				match();
+				continue;
+			}
+			else{
+				boolean found_rule = false;
+				for(int i = 0; i <rules.get(current_symbol).size(); i++){
+					boolean found_symbol = false;
+					for(String p: predictions.get(current_symbol).get(i)){
+						if(p.equals(token.getValue())){
+							derivation.removeFirst();
+							for(int j = rules.get(current_symbol).get(i).size()-1; j>=0; j--)
+								derivation.addFirst(rules.get(current_symbol).get(i).get(j));
+							found_symbol = true;
+							break;
+						}
+					}
+					found_rule |= found_symbol;
+					if(found_rule)
+						break;
+				}
+				if(!found_rule)
+					break;
 			}
 		}
-	}
-
-	private static void classify_symbol(String string) {
-		// TODO Auto-generated method stub
 		
+		ArrayList<String> d = new ArrayList<String>();
+		for(String e: derivation)
+			if(!e.equals(EPS))
+				d.add(e);
+		TreeSet<String> expected_tokens = compute_firsts_from(d, 0);
+		TreeSet<Pair<Integer, String> > sorted_expected_tokens = new TreeSet<Pair<Integer, String>>();
+		for(String e: expected_tokens)
+			if(token_symbol.containsKey(e))
+				sorted_expected_tokens.add(token_symbol.get(e));
+			else if(token_symbol_alt.containsKey(e))
+				sorted_expected_tokens.add(token_symbol_alt.get(e));
+		if(sorted_expected_tokens.size() == 0){
+			out.println("El analisis sintactico ha finalizado exitosamente.");
+			System.exit(0);
+		}
+		if(expected_tokens.contains("proceso")){
+			out.println("Error sintactico: falta proceso");
+		}
+		else{
+			StringBuilder s = new StringBuilder("");
+			s.append("<").append(token.r).append(",").append(token.c).append("> ");
+			s.append("Error sintactico: se encontro: \"").append(token.lexema).append("\"; ");
+			s.append("se esperaba: ");
+			for(Pair<Integer,String> e: sorted_expected_tokens)		
+				s.append("\"").append(e.second).append("\", ");
+			s.setLength(s.length()-2);
+			s.append(".");
+			out.println(s.toString());
+		}
+		System.exit(0);
 	}
-	public static void main(String[] args) throws IOException{
+	
 
+
+	public static void main(String[] args) throws IOException{
+		//br = new BufferedReader(new InputStreamReader(System.in));
+		br = new BufferedReader(new FileReader("in.txt"));
 		init();
 		lexer();
+		parser();
 
 		out.close();
+		br.close();
 	}
 
 
@@ -369,17 +645,25 @@ public class Parser {
 		int r, c;
 		String token, lexema;
 
+
 		public Token(int fila, int columna) {
 			this.r= fila;
 			this.c= columna;
 			this.token = new String("");
 			this.lexema = new String("");
 		}
+		
+		public Token(String token){
+			this.r = 0;
+			this.c = 0;
+			this.token = new String(token);
+			this.lexema = new String("");
+		}
 
 		public void setToken(String token) {
 			this.token = token;
 		}
-
+		
 		public void setLexema(String lexema) {
 			this.lexema = lexema;
 		}
@@ -397,6 +681,12 @@ public class Parser {
 
 		public void fixCase(){
 			this.lexema = this.lexema.toLowerCase();
+		}
+		
+		public String getValue(){
+			if(this.token != "")
+				return this.token;
+			return this.lexema;
 		}
 
 		@Override
@@ -437,6 +727,59 @@ public class Parser {
 			else
 				return "";
 		}
+	}
+	public static class Pair<A, B> {
+	    private A first;
+	    private B second;
+
+	    public Pair(A first, B second) {
+	    	super();
+	    	this.first = first;
+	    	this.second = second;
+	    }
+
+	    public int hashCode() {
+	    	int hashFirst = first != null ? first.hashCode() : 0;
+	    	int hashSecond = second != null ? second.hashCode() : 0;
+
+	    	return (hashFirst + hashSecond) * hashSecond + hashFirst;
+	    }
+
+	    public boolean equals(Object other) {
+	    	if (other instanceof Pair) {
+	    		Pair otherPair = (Pair) other;
+	    		return 
+	    		((  this.first == otherPair.first ||
+	    			( this.first != null && otherPair.first != null &&
+	    			  this.first.equals(otherPair.first))) &&
+	    		 (	this.second == otherPair.second ||
+	    			( this.second != null && otherPair.second != null &&
+	    			  this.second.equals(otherPair.second))) );
+	    	}
+
+	    	return false;
+	    }
+
+	    public String toString()
+	    { 
+	           return "(" + first + ", " + second + ")"; 
+	    }
+
+	    public A getFirst() {
+	    	return first;
+	    }
+
+	    public void setFirst(A first) {
+	    	this.first = first;
+	    }
+
+	    public B getSecond() {
+	    	return second;
+	    }
+
+	    public void setSecond(B second) {
+	    	this.second = second;
+	    }
 	}
 
 }

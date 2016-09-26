@@ -33,7 +33,7 @@ CUERPO -> SEGUN_HACER CUERPO
 CUERPO -> ID_O_LLAMADO CUERPO
 CUERPO -> epsilon
 DIMENSION -> dimension ARREGLO LISTA_ARREGLOS token_pyc
-ARREGLO-> id DIM
+ARREGLO -> id DIM
 DIM -> token_cor_izq EXPRESION LISTA_EXPRESION token_cor_der
 DIM -> token_par_izq EXPRESION LISTA_EXPRESION token_par_der
 LISTA_ARREGLOS -> token_coma ARREGLO LISTA_ARREGLOS
@@ -96,7 +96,7 @@ INSTRUCCION -> borrar pantalla token_pyc
 INSTRUCCION -> escribir EXPRESION LISTA_EXPR token_pyc 
 INS_ESPERAR -> tecla 
 INS_ESPERAR -> EXPRESION segundos  
-CONDICIONAL_SI -> si  EVALUAR_PAR entonces CUERPO SI_NO finsi
+CONDICIONAL_SI -> si EVALUAR_PAR entonces CUERPO SI_NO finsi
 EVALUAR_PAR -> token_par_izq EXPRESION token_par_der
 EVALUAR_PAR -> EXPRESION
 SI_NO -> sino CUERPO
