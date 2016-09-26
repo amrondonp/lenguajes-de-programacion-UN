@@ -401,7 +401,11 @@ public class Parser {
 		do{
 			changed = false;
 			for(String non_terminal : nonTerminals){
+				//System.out.println(non_terminal);
+				//System.out.println(rules.get(non_terminal));
 				for(ArrayList<String> rule: rules.get(non_terminal)){
+					if(!first.containsKey(non_terminal))
+						first.put(non_terminal, new TreeSet<String>());
 					changed |= add_first_from(first.get(non_terminal), rule, 0);
 				}
 			}
@@ -414,11 +418,17 @@ public class Parser {
 		do{
 			changed = false;
 			for(String non_terminal_1: nonTerminals){
+				//System.out.println(non_terminal_1);
 				for(String non_terminal_2: nonTerminals){
+					//System.out.println(non_terminal_2);
 					for(ArrayList<String> rule: rules.get(non_terminal_2)){
 						for(int i = 0; i < rule.size(); i++){
-							if(rule.get(i).equals( non_terminal_1))
+							if(rule.get(i).equals( non_terminal_1)){
+								//System.out.println(rule.toString());
+								if(!follows.containsKey(non_terminal_1))
+									follows.put(non_terminal_1, new TreeSet<String>());
 								changed |= add_follows_from(follows.get(non_terminal_1), non_terminal_2, rule, i+1);
+							}
 						}
 					}
 				}
@@ -436,6 +446,8 @@ public class Parser {
 				add_symbols_of(current_predictions, current_firsts, false);
 				if(contains_eps)
 					add_symbols_of(current_predictions, follows.get(non_terminal), false);
+				if(!predictions.containsKey(non_terminal))
+					predictions.put(non_terminal, new ArrayList<TreeSet<String>>());
 				predictions.get(non_terminal).add(current_predictions);
 			}
 		}
@@ -447,8 +459,11 @@ public class Parser {
 		TreeSet<String> new_firsts = compute_firsts_from(rule, from);
 		boolean contains_eps = new_firsts.contains(EPS);
 		changed |= add_symbols_of(follows_non_terminal, new_firsts, false);
-		if(contains_eps)
+		if(contains_eps){
+			if(!follows.containsKey(non_terminal))
+				follows.put(non_terminal, new TreeSet<String>());
 			changed |= add_symbols_of(follows_non_terminal, follows.get(non_terminal), false );
+		}
 		return changed;
 	}
 	
@@ -472,6 +487,9 @@ public class Parser {
 					break;
 				}
 				else{
+					//System.out.println(rule.toString());
+					if(!first.containsKey(rule.get(i)))
+						first.put(rule.get(i), new TreeSet<String>());
 					boolean contains_eps = first.get(rule.get(i)).contains(EPS);
 					add_symbols_of(new_firsts, first.get(rule.get(i)), false );
 					if(contains_eps){
@@ -495,6 +513,7 @@ public class Parser {
 	
 	private static boolean add_symbols_of(TreeSet<String> set_non_terminal_1, TreeSet<String> set_non_terminal_2, boolean with_eps){
 		boolean changed = false;
+		//System.out.println(set_non_terminal_1);
 		for(String symbol: set_non_terminal_2){
 			if(!with_eps && symbol.equals( EPS))
 				continue;
@@ -521,15 +540,21 @@ public class Parser {
 				//System.out.println(x);
 				classify_symbol(x);
 			}
-			if( currRule.get(currRule.size()-1 ) != EPS )
+			if( !currRule.get(currRule.size()-1 ).equals(EPS) )
 				currRule.add(EPS);
-			rules.put(parts[0], new ArrayList<ArrayList<String>>() );
-			System.out.println(currRule);			
+			if(!rules.containsKey(parts[0]))
+				rules.put(parts[0], new ArrayList<ArrayList<String>>() );
+			//System.out.println("PRE "+parts[0] + " " + rules.get(parts[0]).toString());
+			//System.out.println(currRule);		
 			rules.get(parts[0]).add(currRule);
+			//System.out.println("POST "+parts[0] + " " + rules.get(parts[0]).toString());
 		}
 		/*for(String r: rules.keySet()){
 			System.out.println(r + " " +  rules.get(r).toString());
 		}*/
+		/*System.out.println(terminals.toString());
+		System.out.println(nonTerminals.toString());*/
+		//System.out.println(rules.toString());
 	}
 
 	private static void classify_symbol(String current) {
@@ -631,6 +656,7 @@ public class Parser {
 	public static void main(String[] args) throws IOException{
 		//br = new BufferedReader(new InputStreamReader(System.in));
 		br = new BufferedReader(new FileReader("in.txt"));
+		out = new PrintWriter(new BufferedOutputStream(System.out));
 		init();
 		lexer();
 		parser();
