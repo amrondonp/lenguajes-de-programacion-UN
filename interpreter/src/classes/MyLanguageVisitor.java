@@ -23,17 +23,17 @@ public interface MyLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitGenerarsubproceso(MyLanguageParser.GenerarsubprocesoContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#subproceso_arg}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#iniciosubproceso}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitIniciosubproceso(MyLanguageParser.IniciosubprocesoContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MyLanguageParser#subproceso_arg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#finalizarsubproceso}.
 	 * @param ctx the parse tree

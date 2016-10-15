@@ -1,17 +1,20 @@
 grammar MyLanguage;
 
-programa : generarsubproceso generarproceso;
+programa : generarsubproceso generarproceso EOF
+		 | EOF
+		 ;
 
 generarsubproceso : iniciosubproceso variable_retorno ID subproceso_arg cuerpo finalizarsubproceso generarsubproceso
 		   |
 		   ;
-subproceso_arg : TOKEN_PAR_IZQ argumento TOKEN_PAR_DER
-			   |
-			   ;
 iniciosubproceso : Subproceso
 				 | Subalgoritmo
 				 | Funcion
 				 ;
+subproceso_arg : TOKEN_PAR_IZQ argumento TOKEN_PAR_DER
+			   |
+			   ;
+
 finalizarsubproceso : Finsubproceso
 			  | Finsubalgoritmo
 			  | Finfuncion
@@ -178,60 +181,9 @@ lista_arg_llamado : TOKEN_COMA expresion lista_arg_llamado
 acceder_arreglo : index;
 index : TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER;
 						
-
-				
-
-
-
-
-
-
-
-
-			
-		
-
-
 COMMENT 		: '/*' .*? '*/' -> skip ;
 LINE_COMMENT 	: '//' ~[\r\n]* -> skip ;
 WS		: [ \t\r\n]+ -> skip ;
-
-ID : [a-zA-Z][a-zA-Z0-9_]* ;
-TOKEN_ENTERO : [0-9]+ ;
-TOKEN_REAL : [0-9]+[.][0-9]+ ;
-TOKEN_CADENA : '"'[.]* ;
-TOKEN_PAR_IZQ : '(';
-TOKEN_PAR_DER : ')';
-TOKEN_COR_IZQ : '[';
-TOKEN_COR_DER : ']';	  
-TOKEN_PYC : ';';
-TOKEN_ASIG : '<-';
-TOKEN_DIF : '<>';
-TOKEN_MENOR : '<';
-TOKEN_MAYOR : '>';
-TOKEN_MENOR_IGUAL : '<=';
-TOKEN_MAYOR_IGUAL : '>='; 
-TOKEN_COMA : ',';
-TOKEN_O : '|'
-		| O
-		;
-TOKEN_Y : '&'
-		| Y
-		;
-TOKEN_NEG : '~'
-			| N O;
-TOKEN_IGUAL : '='
-			| '==';
-TOKEN_MAS : '+';
-TOKEN_MENOS : '-';
-TOKEN_DIV : '/';
-TOKEN_MUL : '*';
-TOKEN_MOD : '%'
-			| Mod 
-			;
-TOKEN_DOSP : ':';
-TOKEN_POT : '^';
-TOKEN_EOF : '$';
 
 
 
@@ -287,36 +239,43 @@ Finsubproceso : 'finsubproceso';
 Borrar : 'borrar';
 Finsubalgoritmo : 'finsubalgoritmo';
 Subalgoritmo : 'subalgoritmo';
-Caso : 'caso';
+Caso : 'caso';		
 
+TOKEN_ENTERO : [0-9]+ ;
+TOKEN_REAL : [0-9]+[.][0-9]+ ;
+TOKEN_CADENA : '"'[.]* ;
+TOKEN_PAR_IZQ : '(';
+TOKEN_PAR_DER : ')';
+TOKEN_COR_IZQ : '[';
+TOKEN_COR_DER : ']';	  
+TOKEN_PYC : ';';
+TOKEN_ASIG : '<-';
+TOKEN_DIF : '<>';
+TOKEN_MENOR : '<';
+TOKEN_MAYOR : '>';
+TOKEN_MENOR_IGUAL : '<=';
+TOKEN_MAYOR_IGUAL : '>='; 
+TOKEN_COMA : ',';
+TOKEN_O : '|'
+		| 'o'
+		;
+TOKEN_Y : '&'
+		| 'y'
+		;
+TOKEN_NEG : '~'
+			| 'no';
+TOKEN_IGUAL : '='
+			| '==';
+TOKEN_MAS : '+';
+TOKEN_MENOS : '-';
+TOKEN_DIV : '/';
+TOKEN_MUL : '*';
+TOKEN_MOD : '%'
+			| Mod 
+			;
+TOKEN_DOSP : ':';
+TOKEN_POT : '^';
+TOKEN_EOF : '$';
+	 
 
-
-fragment A: 'A'|'a';
-B: 'B'|'b';
-C: 'C'|'c';
-D: 'D'|'d';
-E: 'E'|'e';
-F: 'F'|'f';
-G: 'G'|'g';
-H: 'H'|'h';
-I: 'I'|'i';
-J: 'J'|'j';
-K: 'K'|'k';
-L: 'L'|'l';
-M: 'M'|'m';
-N: 'N'|'n';
-O: 'O'|'o';
-P: 'P'|'p';
-Q: 'Q'|'q';
-R: 'R'|'r';
-S: 'S'|'s';
-T: 'T'|'t';
-U: 'U'|'u';
-V: 'V'|'v';
-W: 'W'|'w';
-X: 'X'|'x';
-Y: 'Y'|'y';
-Z: 'Z'|'z';
-
-	
-				 
+ID : [a-zA-Z][a-zA-Z0-9_]* ;

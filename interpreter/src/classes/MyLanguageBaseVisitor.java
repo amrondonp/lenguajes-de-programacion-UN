@@ -31,14 +31,14 @@ public class MyLanguageBaseVisitor<T> extends AbstractParseTreeVisitor<T> implem
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx) { return visitChildren(ctx); }
+	@Override public T visitIniciosubproceso(MyLanguageParser.IniciosubprocesoContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitIniciosubproceso(MyLanguageParser.IniciosubprocesoContext ctx) { return visitChildren(ctx); }
+	@Override public T visitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

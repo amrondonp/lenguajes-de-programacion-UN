@@ -40,18 +40,6 @@ public class MyLanguageBaseListener implements MyLanguageListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterIniciosubproceso(MyLanguageParser.IniciosubprocesoContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -59,6 +47,18 @@ public class MyLanguageBaseListener implements MyLanguageListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitIniciosubproceso(MyLanguageParser.IniciosubprocesoContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

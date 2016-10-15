@@ -28,16 +28,6 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 */
 	void exitGenerarsubproceso(MyLanguageParser.GenerarsubprocesoContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#subproceso_arg}.
-	 * @param ctx the parse tree
-	 */
-	void enterSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#subproceso_arg}.
-	 * @param ctx the parse tree
-	 */
-	void exitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#iniciosubproceso}.
 	 * @param ctx the parse tree
 	 */
@@ -47,6 +37,16 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitIniciosubproceso(MyLanguageParser.IniciosubprocesoContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MyLanguageParser#subproceso_arg}.
+	 * @param ctx the parse tree
+	 */
+	void enterSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MyLanguageParser#subproceso_arg}.
+	 * @param ctx the parse tree
+	 */
+	void exitSubproceso_arg(MyLanguageParser.Subproceso_argContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#finalizarsubproceso}.
 	 * @param ctx the parse tree
