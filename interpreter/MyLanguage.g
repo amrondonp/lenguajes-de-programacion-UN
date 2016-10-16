@@ -74,6 +74,7 @@ asignar : TOKEN_ASIG expresion;
 lista_expr : TOKEN_COMA expresion lista_expr
 			|
 			;
+					
 expresion : termino complemento;
 complemento : TOKEN_Y termino complemento
 			| TOKEN_O termino complemento
