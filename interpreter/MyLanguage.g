@@ -258,7 +258,7 @@ TOKEN_MAYOR : '>';
 TOKEN_MENOR_IGUAL : '<=';
 TOKEN_MAYOR_IGUAL : '>=';
 TOKEN_COMA : ',';
-TOKEN_O : '|'
+TOKEN_O : '\u007C'
 		| 'o'
 		;
 TOKEN_Y : '&'

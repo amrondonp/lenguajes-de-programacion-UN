@@ -3,6 +3,6 @@ SubProceso Saludar
 FinSubProceso
 
 Proceso mi_proceso
-    Saludar;
-    Saludar();
+    si a | b entonces
+    finsi
 FinProceso
