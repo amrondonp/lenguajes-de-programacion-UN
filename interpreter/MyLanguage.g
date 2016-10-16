@@ -20,13 +20,13 @@ finalizarsubproceso : Finsubproceso
 			  | Finfuncion
 			  ;
 variable_retorno : ID TOKEN_ASIG
-				 | 
+				 |
 				 ;
 argumento : ID lista
 		  |
 		  ;
 lista : TOKEN_COMA ID lista
-	  | 
+	  |
 	  ;
 
 generarproceso : inicioproceso ID cuerpo finalizarproceso;
@@ -38,15 +38,15 @@ finalizarproceso : Finproceso
 		   ;
 
 
-cuerpo 	: definicion cuerpo
-		| asignacion_llamado cuerpo
+cuerpo 	: Definir definicion cuerpo
 		| instruccion cuerpo
-		| dimensionar cuerpo
-		| condicional_si cuerpo
-		| ciclo_para cuerpo
-		| ciclo_mientras cuerpo
-		| ciclo_repetir cuerpo
-		| segun_hacer cuerpo
+		| Dimension dimensionar cuerpo
+		| Si condicional_si cuerpo
+		| Para ciclo_para cuerpo
+		| Mientras ciclo_mientras cuerpo
+		| Repetir ciclo_repetir cuerpo
+		| Segun segun_hacer cuerpo
+		| asignacion_llamado cuerpo
 		|
 		;
 
@@ -54,16 +54,16 @@ cuerpo 	: definicion cuerpo
 llamado_sub	: ID arg_llamado_proceso;
 llamado_arr : ID acceder_arreglo;
 
-dimensionar	: Dimension arreglo lista_arreglos TOKEN_PYC;
+dimensionar	: arreglo lista_arreglos TOKEN_PYC;
 arreglo : ID dim;
 dim	: TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER
 	| TOKEN_PAR_IZQ expresion lista_expr TOKEN_PAR_DER
 	;
 lista_arreglos  : TOKEN_COMA arreglo lista_arreglos
-				| 
+				|
 				;
 
-definicion	: Definir ID lista Como tipo TOKEN_PYC ;
+definicion	: ID lista Como tipo TOKEN_PYC ;
 
 asignacion_llamado	: ID llamar_o_asignar TOKEN_PYC;
 llamar_o_asignar : asignar
@@ -105,7 +105,7 @@ expresion_mat2 : TOKEN_MUL termino complemento
 				| TOKEN_MOD termino complemento
 				| TOKEN_POT termino complemento
 				| TOKEN_DIV termino complemento
-				| 
+				|
 				;
 termino : TOKEN_PAR_IZQ expresion TOKEN_PAR_DER
 		| constante
@@ -140,27 +140,27 @@ ins_esperar : Tecla
 				| expresion Segundos
 				;
 lista_id_o_llamado : TOKEN_COMA id_o_llamado lista_id_o_llamado
-					| 
+					|
 					;
-condicional_si : Si evaluar_par Entonces cuerpo si_no Finsi;
+condicional_si : evaluar_par Entonces cuerpo si_no Finsi;
 evaluar_par : TOKEN_PAR_IZQ expresion TOKEN_PAR_DER
 				| expresion
 				;
 si_no : Sino cuerpo
-		| 
+		|
 		;
-ciclo_para : Para ID TOKEN_ASIG expresion Hasta expresion con_paso Hacer cuerpo Finpara;
+ciclo_para : ID TOKEN_ASIG expresion Hasta expresion con_paso Hacer cuerpo Finpara;
 con_paso : Con Paso expresion
-			| 
+			|
 			;
-ciclo_mientras: Mientras expresion Hacer cuerpo Finmientras;
-ciclo_repetir : Repetir cuerpo Hasta Que expresion;
-segun_hacer : Segun expresion Hacer casos de_otro_modo Finsegun;
+ciclo_mientras: expresion Hacer cuerpo Finmientras;
+ciclo_repetir : cuerpo Hasta Que expresion;
+segun_hacer : expresion Hacer casos de_otro_modo Finsegun;
 de_otro_modo : De Otro Modo TOKEN_DOSP cuerpo
 				|
 				;
 casos : caso_segun casos
-		| 
+		|
 		;
 caso_segun : Caso expresion TOKEN_DOSP cuerpo ;
 id_o_llamado : ID complemento_id_o_llamado;
@@ -180,7 +180,7 @@ lista_arg_llamado : TOKEN_COMA expresion lista_arg_llamado
 					;
 acceder_arreglo : index;
 index : TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER;
-						
+
 COMMENT 		: '/*' .*? '*/' -> skip ;
 LINE_COMMENT 	: '//' ~[\r\n]* -> skip ;
 WS		: [ \t\r\n]+ -> skip ;
@@ -239,22 +239,23 @@ Finsubproceso : 'finsubproceso';
 Borrar : 'borrar';
 Finsubalgoritmo : 'finsubalgoritmo';
 Subalgoritmo : 'subalgoritmo';
-Caso : 'caso';		
+Caso : 'caso';
 
-TOKEN_ENTERO : [0-9]+ ;
-TOKEN_REAL : [0-9]+[.][0-9]+ ;
-TOKEN_CADENA : '"'[.]* ;
+TOKEN_ENTERO : [0-9]+	;
+TOKEN_REAL : [0-9]+[.][0-9]+;
+TOKEN_CADENA : [\'|"].*?[\'|"] ;
+
 TOKEN_PAR_IZQ : '(';
 TOKEN_PAR_DER : ')';
 TOKEN_COR_IZQ : '[';
-TOKEN_COR_DER : ']';	  
+TOKEN_COR_DER : ']';
 TOKEN_PYC : ';';
 TOKEN_ASIG : '<-';
 TOKEN_DIF : '<>';
 TOKEN_MENOR : '<';
 TOKEN_MAYOR : '>';
 TOKEN_MENOR_IGUAL : '<=';
-TOKEN_MAYOR_IGUAL : '>='; 
+TOKEN_MAYOR_IGUAL : '>=';
 TOKEN_COMA : ',';
 TOKEN_O : '|'
 		| 'o'
@@ -271,11 +272,11 @@ TOKEN_MENOS : '-';
 TOKEN_DIV : '/';
 TOKEN_MUL : '*';
 TOKEN_MOD : '%'
-			| Mod 
+			| Mod
 			;
 TOKEN_DOSP : ':';
 TOKEN_POT : '^';
 TOKEN_EOF : '$';
-	 
+
 
 ID : [a-zA-Z][a-zA-Z0-9_]* ;

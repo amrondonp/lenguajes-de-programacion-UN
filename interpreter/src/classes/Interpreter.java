@@ -17,14 +17,14 @@ public class Interpreter {
 		}
 		
 		ANTLRInputStream input = new ANTLRInputStream(buffer);
-		System.out.println(input.toString());
+		//System.out.println(input.toString());
 		MyLanguageLexer lexer = new MyLanguageLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		MyLanguageParser parser = new MyLanguageParser(tokens);
 		ParseTree tree = parser.programa();
-		System.out.println(tree.toStringTree(parser));
 		MyVisitor<Object> loader = new MyVisitor<Object>();
 		loader.visit(tree);
+		System.out.println("todo bien, todo bonito");
 		br.close();
 
 	}
