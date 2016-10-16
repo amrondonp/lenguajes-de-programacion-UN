@@ -36,7 +36,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 	
 	@Override
 	public T visitInstruccion(InstruccionContext ctx) {
-		tuutututututututu
+		System.out.println();
 		return super.visitInstruccion(ctx);
 	}
 	
