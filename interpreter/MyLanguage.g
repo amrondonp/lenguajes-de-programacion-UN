@@ -93,6 +93,7 @@ expresion	: expresion TOKEN_POT expresion
 
 
 
+
 constante : TOKEN_ENTERO
 			| TOKEN_REAL
 			| TOKEN_CADENA
@@ -219,9 +220,20 @@ Finsubalgoritmo : 'finsubalgoritmo';
 Subalgoritmo : 'subalgoritmo';
 Caso : 'caso';
 
-TOKEN_ENTERO : [0-9]+	;
-TOKEN_REAL : [0-9]+[.][0-9]+;
-TOKEN_CADENA : [\'|"].*?[\'|"] ;
+
+RELOP	: TOKEN_MENOR
+			| TOKEN_MENOR_IGUAL
+			| TOKEN_MAYOR
+			| TOKEN_MAYOR_IGUAL
+			;
+
+IODOP	: TOKEN_IGUAL
+			| TOKEN_DIF
+			;
+
+SUMOP : TOKEN_MAS | TOKEN_MENOS;
+MULOP : TOKEN_MUL | TOKEN_DIV | TOKEN_MOD;
+
 
 TOKEN_PAR_IZQ : '(';
 TOKEN_PAR_DER : ')';
@@ -257,17 +269,10 @@ TOKEN_POT : '^';
 TOKEN_EOF : '$';
 
 
-RELOP	: TOKEN_MENOR
-			| TOKEN_MENOR_IGUAL
-			| TOKEN_MAYOR
-			| TOKEN_MAYOR_IGUAL
-			;
 
-IODOP	: TOKEN_IGUAL
-			| TOKEN_DIF
-			;
 
-SUMOP : TOKEN_MAS | TOKEN_MENOS;
-MULOP : TOKEN_MUL | TOKEN_DIV | TOKEN_MOD;
+TOKEN_ENTERO : [0-9]+	;
+TOKEN_REAL : [0-9]+[.][0-9]+;
+TOKEN_CADENA : [\'|"].*?[\'|"] ;
 
 ID : [a-zA-Z][a-zA-Z0-9_]* ;
