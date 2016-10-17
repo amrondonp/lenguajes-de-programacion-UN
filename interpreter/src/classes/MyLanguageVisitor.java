@@ -83,18 +83,6 @@ public interface MyLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitCuerpo(MyLanguageParser.CuerpoContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#llamado_sub}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLlamado_sub(MyLanguageParser.Llamado_subContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#llamado_arr}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLlamado_arr(MyLanguageParser.Llamado_arrContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#dimensionar}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -149,47 +137,17 @@ public interface MyLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLista_expr(MyLanguageParser.Lista_exprContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#expresion}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpresion(MyLanguageParser.ExpresionContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#complemento}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitComplemento(MyLanguageParser.ComplementoContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#expresion_logica}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitExpresion_logica(MyLanguageParser.Expresion_logicaContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#complementos_adicionales}.
+	 * Visit a parse tree produced by {@link MyLanguageParser#expresion}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitComplementos_adicionales(MyLanguageParser.Complementos_adicionalesContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#expresion_mat}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpresion_mat(MyLanguageParser.Expresion_matContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#expresion_mat2}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExpresion_mat2(MyLanguageParser.Expresion_mat2Context ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#termino}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTermino(MyLanguageParser.TerminoContext ctx);
+	T visitExpresion(MyLanguageParser.ExpresionContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#constante}.
 	 * @param ctx the parse tree
@@ -202,6 +160,36 @@ public interface MyLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitTipo(MyLanguageParser.TipoContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MyLanguageParser#id}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitId(MyLanguageParser.IdContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MyLanguageParser#llamado}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLlamado(MyLanguageParser.LlamadoContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MyLanguageParser#pars_fun}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPars_fun(MyLanguageParser.Pars_funContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MyLanguageParser#pars_lista}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPars_lista(MyLanguageParser.Pars_listaContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link MyLanguageParser#acceder_arreglo}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAcceder_arreglo(MyLanguageParser.Acceder_arregloContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#instruccion}.
 	 * @param ctx the parse tree
@@ -232,12 +220,6 @@ public interface MyLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCondicional_si(MyLanguageParser.Condicional_siContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#evaluar_par}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEvaluar_par(MyLanguageParser.Evaluar_parContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link MyLanguageParser#si_no}.
 	 * @param ctx the parse tree
@@ -292,52 +274,4 @@ public interface MyLanguageVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitCaso_segun(MyLanguageParser.Caso_segunContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#id_o_llamado}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitId_o_llamado(MyLanguageParser.Id_o_llamadoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#complemento_id_o_llamado}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitComplemento_id_o_llamado(MyLanguageParser.Complemento_id_o_llamadoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#llamado_proceso}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLlamado_proceso(MyLanguageParser.Llamado_procesoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#arg_llamado_proceso}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArg_llamado_proceso(MyLanguageParser.Arg_llamado_procesoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#arg_llamado}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitArg_llamado(MyLanguageParser.Arg_llamadoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#lista_arg_llamado}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitLista_arg_llamado(MyLanguageParser.Lista_arg_llamadoContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#acceder_arreglo}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitAcceder_arreglo(MyLanguageParser.Acceder_arregloContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link MyLanguageParser#index}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIndex(MyLanguageParser.IndexContext ctx);
 }

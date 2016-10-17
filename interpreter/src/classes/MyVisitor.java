@@ -3,6 +3,8 @@ package classes;
 import java.util.HashMap;
 import java.util.Stack;
 
+import classes.MyLanguageParser.ExpresionContext;
+import classes.MyLanguageParser.Expresion_logicaContext;
 import classes.MyLanguageParser.GenerarprocesoContext;
 import classes.MyLanguageParser.InstruccionContext;
 import classes.MyLanguageParser.ProgramaContext;
@@ -36,8 +38,22 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 	
 	@Override
 	public T visitInstruccion(InstruccionContext ctx) {
-		System.out.println();
+		if(ctx.Escribir() != null){
+			//TODO
+			//id			
+			//entero
+			//real
+			//boleano
+			//cadena
+		}
+		//TODO
 		return super.visitInstruccion(ctx);
 	}
+	@Override
+	public T visitExpresion(ExpresionContext ctx) {
+
+		return super.visitExpresion(ctx);
+	}
+	
 	
 }

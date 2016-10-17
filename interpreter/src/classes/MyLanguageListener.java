@@ -128,26 +128,6 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 */
 	void exitCuerpo(MyLanguageParser.CuerpoContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#llamado_sub}.
-	 * @param ctx the parse tree
-	 */
-	void enterLlamado_sub(MyLanguageParser.Llamado_subContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#llamado_sub}.
-	 * @param ctx the parse tree
-	 */
-	void exitLlamado_sub(MyLanguageParser.Llamado_subContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#llamado_arr}.
-	 * @param ctx the parse tree
-	 */
-	void enterLlamado_arr(MyLanguageParser.Llamado_arrContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#llamado_arr}.
-	 * @param ctx the parse tree
-	 */
-	void exitLlamado_arr(MyLanguageParser.Llamado_arrContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#dimensionar}.
 	 * @param ctx the parse tree
 	 */
@@ -238,26 +218,6 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 */
 	void exitLista_expr(MyLanguageParser.Lista_exprContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#expresion}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpresion(MyLanguageParser.ExpresionContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#expresion}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpresion(MyLanguageParser.ExpresionContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#complemento}.
-	 * @param ctx the parse tree
-	 */
-	void enterComplemento(MyLanguageParser.ComplementoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#complemento}.
-	 * @param ctx the parse tree
-	 */
-	void exitComplemento(MyLanguageParser.ComplementoContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#expresion_logica}.
 	 * @param ctx the parse tree
 	 */
@@ -268,45 +228,15 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 */
 	void exitExpresion_logica(MyLanguageParser.Expresion_logicaContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#complementos_adicionales}.
+	 * Enter a parse tree produced by {@link MyLanguageParser#expresion}.
 	 * @param ctx the parse tree
 	 */
-	void enterComplementos_adicionales(MyLanguageParser.Complementos_adicionalesContext ctx);
+	void enterExpresion(MyLanguageParser.ExpresionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#complementos_adicionales}.
+	 * Exit a parse tree produced by {@link MyLanguageParser#expresion}.
 	 * @param ctx the parse tree
 	 */
-	void exitComplementos_adicionales(MyLanguageParser.Complementos_adicionalesContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#expresion_mat}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpresion_mat(MyLanguageParser.Expresion_matContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#expresion_mat}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpresion_mat(MyLanguageParser.Expresion_matContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#expresion_mat2}.
-	 * @param ctx the parse tree
-	 */
-	void enterExpresion_mat2(MyLanguageParser.Expresion_mat2Context ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#expresion_mat2}.
-	 * @param ctx the parse tree
-	 */
-	void exitExpresion_mat2(MyLanguageParser.Expresion_mat2Context ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#termino}.
-	 * @param ctx the parse tree
-	 */
-	void enterTermino(MyLanguageParser.TerminoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#termino}.
-	 * @param ctx the parse tree
-	 */
-	void exitTermino(MyLanguageParser.TerminoContext ctx);
+	void exitExpresion(MyLanguageParser.ExpresionContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#constante}.
 	 * @param ctx the parse tree
@@ -327,6 +257,56 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitTipo(MyLanguageParser.TipoContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MyLanguageParser#id}.
+	 * @param ctx the parse tree
+	 */
+	void enterId(MyLanguageParser.IdContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MyLanguageParser#id}.
+	 * @param ctx the parse tree
+	 */
+	void exitId(MyLanguageParser.IdContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MyLanguageParser#llamado}.
+	 * @param ctx the parse tree
+	 */
+	void enterLlamado(MyLanguageParser.LlamadoContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MyLanguageParser#llamado}.
+	 * @param ctx the parse tree
+	 */
+	void exitLlamado(MyLanguageParser.LlamadoContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MyLanguageParser#pars_fun}.
+	 * @param ctx the parse tree
+	 */
+	void enterPars_fun(MyLanguageParser.Pars_funContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MyLanguageParser#pars_fun}.
+	 * @param ctx the parse tree
+	 */
+	void exitPars_fun(MyLanguageParser.Pars_funContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MyLanguageParser#pars_lista}.
+	 * @param ctx the parse tree
+	 */
+	void enterPars_lista(MyLanguageParser.Pars_listaContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MyLanguageParser#pars_lista}.
+	 * @param ctx the parse tree
+	 */
+	void exitPars_lista(MyLanguageParser.Pars_listaContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link MyLanguageParser#acceder_arreglo}.
+	 * @param ctx the parse tree
+	 */
+	void enterAcceder_arreglo(MyLanguageParser.Acceder_arregloContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link MyLanguageParser#acceder_arreglo}.
+	 * @param ctx the parse tree
+	 */
+	void exitAcceder_arreglo(MyLanguageParser.Acceder_arregloContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#instruccion}.
 	 * @param ctx the parse tree
@@ -377,16 +357,6 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCondicional_si(MyLanguageParser.Condicional_siContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#evaluar_par}.
-	 * @param ctx the parse tree
-	 */
-	void enterEvaluar_par(MyLanguageParser.Evaluar_parContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#evaluar_par}.
-	 * @param ctx the parse tree
-	 */
-	void exitEvaluar_par(MyLanguageParser.Evaluar_parContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link MyLanguageParser#si_no}.
 	 * @param ctx the parse tree
@@ -477,84 +447,4 @@ public interface MyLanguageListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitCaso_segun(MyLanguageParser.Caso_segunContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#id_o_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void enterId_o_llamado(MyLanguageParser.Id_o_llamadoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#id_o_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void exitId_o_llamado(MyLanguageParser.Id_o_llamadoContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#complemento_id_o_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void enterComplemento_id_o_llamado(MyLanguageParser.Complemento_id_o_llamadoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#complemento_id_o_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void exitComplemento_id_o_llamado(MyLanguageParser.Complemento_id_o_llamadoContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#llamado_proceso}.
-	 * @param ctx the parse tree
-	 */
-	void enterLlamado_proceso(MyLanguageParser.Llamado_procesoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#llamado_proceso}.
-	 * @param ctx the parse tree
-	 */
-	void exitLlamado_proceso(MyLanguageParser.Llamado_procesoContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#arg_llamado_proceso}.
-	 * @param ctx the parse tree
-	 */
-	void enterArg_llamado_proceso(MyLanguageParser.Arg_llamado_procesoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#arg_llamado_proceso}.
-	 * @param ctx the parse tree
-	 */
-	void exitArg_llamado_proceso(MyLanguageParser.Arg_llamado_procesoContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#arg_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void enterArg_llamado(MyLanguageParser.Arg_llamadoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#arg_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void exitArg_llamado(MyLanguageParser.Arg_llamadoContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#lista_arg_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void enterLista_arg_llamado(MyLanguageParser.Lista_arg_llamadoContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#lista_arg_llamado}.
-	 * @param ctx the parse tree
-	 */
-	void exitLista_arg_llamado(MyLanguageParser.Lista_arg_llamadoContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#acceder_arreglo}.
-	 * @param ctx the parse tree
-	 */
-	void enterAcceder_arreglo(MyLanguageParser.Acceder_arregloContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#acceder_arreglo}.
-	 * @param ctx the parse tree
-	 */
-	void exitAcceder_arreglo(MyLanguageParser.Acceder_arregloContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link MyLanguageParser#index}.
-	 * @param ctx the parse tree
-	 */
-	void enterIndex(MyLanguageParser.IndexContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link MyLanguageParser#index}.
-	 * @param ctx the parse tree
-	 */
-	void exitIndex(MyLanguageParser.IndexContext ctx);
 }

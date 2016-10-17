@@ -1,5 +1,7 @@
 grammar MyLanguage;
 
+
+
 programa : generarsubproceso generarproceso EOF
 		 | EOF
 		 ;
@@ -51,9 +53,6 @@ cuerpo 	: Definir definicion cuerpo
 		;
 
 
-llamado_sub	: ID arg_llamado_proceso;
-llamado_arr : ID acceder_arreglo;
-
 dimensionar	: arreglo lista_arreglos TOKEN_PYC;
 arreglo : ID dim;
 dim	: TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER
@@ -68,58 +67,39 @@ definicion	: ID lista Como tipo TOKEN_PYC ;
 asignacion_llamado	: ID llamar_o_asignar TOKEN_PYC;
 llamar_o_asignar : asignar
 				| acceder_arreglo asignar
-				| llamado_proceso
+				| pars_fun
 				;
 asignar : TOKEN_ASIG expresion;
 lista_expr : TOKEN_COMA expresion lista_expr
 			|
 			;
-					
-expresion : termino complemento;
-complemento : TOKEN_Y termino complemento
-			| TOKEN_O termino complemento
-			| expresion_logica
-			;
-expresion_logica : TOKEN_IGUAL termino complementos_adicionales
-					| TOKEN_DIF termino complementos_adicionales
-					| TOKEN_MENOR termino complementos_adicionales
-					| TOKEN_MAYOR termino complementos_adicionales
-					| TOKEN_MENOR_IGUAL termino complementos_adicionales
-					| TOKEN_MAYOR_IGUAL termino complementos_adicionales
-					| expresion_mat
+
+expresion_logica	: TOKEN_NEG expresion_logica
+									| expresion_logica RELOP expresion_logica
+									| expresion_logica IODOP expresion_logica
+									| expresion_logica TOKEN_Y expresion_logica
+									| expresion_logica TOKEN_O expresion_logica
+									| TOKEN_PAR_IZQ expresion_logica TOKEN_PAR_DER
+									| expresion
+									;
+
+expresion	: expresion TOKEN_POT expresion
+					| expresion MULOP expresion
+					| expresion SUMOP expresion
+					| constante
+					| id
+					| TOKEN_PAR_IZQ expresion TOKEN_PAR_DER
 					;
-complementos_adicionales : TOKEN_Y termino complemento
-							| TOKEN_O termino complemento
-							| TOKEN_MAS termino complemento
-							| TOKEN_MENOS termino complemento
-							| TOKEN_MUL termino complemento
-							| TOKEN_MOD termino complemento
-							| TOKEN_POT termino complemento
-							| TOKEN_DIV termino complemento
-							|
-							;
-expresion_mat : TOKEN_MAS termino complemento
-				| TOKEN_MENOS termino complemento
-				| expresion_mat2
-				;
-expresion_mat2 : TOKEN_MUL termino complemento
-				| TOKEN_MOD termino complemento
-				| TOKEN_POT termino complemento
-				| TOKEN_DIV termino complemento
-				|
-				;
-termino : TOKEN_PAR_IZQ expresion TOKEN_PAR_DER
-		| constante
-		| id_o_llamado
-		| TOKEN_MENOS expresion
-		| TOKEN_NEG expresion
-		;
+
+
+
 constante : TOKEN_ENTERO
 			| TOKEN_REAL
 			| TOKEN_CADENA
 			| Verdadero
 			| Falso
 			;
+
 tipo : Caracter
 		| Entero
 		| Logico
@@ -129,10 +109,25 @@ tipo : Caracter
 		| Texto
 		| Cadena
 		;
+
+
+		id : ID llamado ;
+		llamado	:
+							|	acceder_arreglo
+							| pars_fun
+							;
+		pars_fun : TOKEN_PAR_IZQ pars_lista TOKEN_PAR_DER;
+		pars_lista : expresion lista_expr
+							 |
+							 ;
+
+		acceder_arreglo : TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER ;
+
+
 instruccion : Esperar ins_esperar TOKEN_PYC
 				| ins_borrar Pantalla TOKEN_PYC
 				| Escribir expresion lista_expr TOKEN_PYC
-				| Leer id_o_llamado lista_id_o_llamado TOKEN_PYC
+				| Leer id lista_id_o_llamado TOKEN_PYC
 				;
 ins_borrar : Borrar
 			| Limpiar
@@ -140,22 +135,20 @@ ins_borrar : Borrar
 ins_esperar : Tecla
 				| expresion Segundos
 				;
-lista_id_o_llamado : TOKEN_COMA id_o_llamado lista_id_o_llamado
+lista_id_o_llamado : TOKEN_COMA id lista_id_o_llamado
 					|
 					;
-condicional_si : evaluar_par Entonces cuerpo si_no Finsi;
-evaluar_par : TOKEN_PAR_IZQ expresion TOKEN_PAR_DER
-				| expresion
-				;
+condicional_si : expresion_logica Entonces cuerpo si_no Finsi;
+
 si_no : Sino cuerpo
 		|
 		;
-ciclo_para : ID TOKEN_ASIG expresion Hasta expresion con_paso Hacer cuerpo Finpara;
+ciclo_para : ID TOKEN_ASIG expresion Hasta expresion_logica con_paso Hacer cuerpo Finpara;
 con_paso : Con Paso expresion
 			|
 			;
-ciclo_mientras: expresion Hacer cuerpo Finmientras;
-ciclo_repetir : cuerpo Hasta Que expresion;
+ciclo_mientras: expresion_logica Hacer cuerpo Finmientras;
+ciclo_repetir : cuerpo Hasta Que expresion_logica;
 segun_hacer : expresion Hacer casos de_otro_modo Finsegun;
 de_otro_modo : De Otro Modo TOKEN_DOSP cuerpo
 				|
@@ -164,23 +157,7 @@ casos : caso_segun casos
 		|
 		;
 caso_segun : Caso expresion TOKEN_DOSP cuerpo ;
-id_o_llamado : ID complemento_id_o_llamado;
-complemento_id_o_llamado : acceder_arreglo
-							| llamado_proceso
-							|
-							;
-llamado_proceso : arg_llamado_proceso;
-arg_llamado_proceso : TOKEN_PAR_IZQ arg_llamado TOKEN_PAR_DER
-						|
-						;
-arg_llamado : expresion lista_arg_llamado
-				|
-				;
-lista_arg_llamado : TOKEN_COMA expresion lista_arg_llamado
-					|
-					;
-acceder_arreglo : index;
-index : TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER;
+
 
 COMMENT 		: '/*' .*? '*/' -> skip ;
 LINE_COMMENT 	: '//' ~[\r\n]* -> skip ;
@@ -279,5 +256,18 @@ TOKEN_DOSP : ':';
 TOKEN_POT : '^';
 TOKEN_EOF : '$';
 
+
+RELOP	: TOKEN_MENOR
+			| TOKEN_MENOR_IGUAL
+			| TOKEN_MAYOR
+			| TOKEN_MAYOR_IGUAL
+			;
+
+IODOP	: TOKEN_IGUAL
+			| TOKEN_DIF
+			;
+
+SUMOP : TOKEN_MAS | TOKEN_MENOS;
+MULOP : TOKEN_MUL | TOKEN_DIV | TOKEN_MOD;
 
 ID : [a-zA-Z][a-zA-Z0-9_]* ;
