@@ -24,7 +24,7 @@ public class Interpreter {
 		ParseTree tree = parser.programa();
 		MyVisitor<Object> loader = new MyVisitor<Object>();
 		loader.visit(tree);
-		System.out.println("todo bien, todo bonito");
+		//System.out.println("todo bien, todo bonito");
 		br.close();
 
 	}

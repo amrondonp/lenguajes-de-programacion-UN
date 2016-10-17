@@ -151,7 +151,7 @@ con_paso : Con Paso expresion
 			;
 ciclo_mientras: expresion_logica Hacer cuerpo Finmientras;
 ciclo_repetir : cuerpo Hasta Que expresion_logica;
-segun_hacer : Segun ID Hacer casos de_otro_modo Finsegun;
+segun_hacer :  id Hacer casos de_otro_modo Finsegun;
 de_otro_modo : De Otro Modo TOKEN_DOSP cuerpo
 				|
 				;
@@ -231,7 +231,7 @@ RELOP	: TOKEN_MENOR
 IODOP	: TOKEN_IGUAL
 			| TOKEN_DIF
 			;
-TOKEN_MENOS : '-';	
+TOKEN_MENOS : '-';
 SUMOP : TOKEN_MAS | TOKEN_MENOS;
 MULOP : TOKEN_MUL | TOKEN_DIV | TOKEN_MOD;
 
