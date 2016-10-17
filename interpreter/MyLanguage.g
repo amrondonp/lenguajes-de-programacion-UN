@@ -69,8 +69,8 @@ llamar_o_asignar : asignar
 				| acceder_arreglo asignar
 				| pars_fun
 				;
-asignar : TOKEN_ASIG expresion;
-lista_expr : TOKEN_COMA expresion lista_expr
+asignar : TOKEN_ASIG expresion_logica;
+lista_expr : TOKEN_COMA expresion_logica lista_expr
 			|
 			;
 
@@ -119,7 +119,7 @@ tipo : Caracter
 							| pars_fun
 							;
 		pars_fun : TOKEN_PAR_IZQ pars_lista TOKEN_PAR_DER;
-		pars_lista : expresion lista_expr
+		pars_lista : expresion_logica lista_expr
 							 |
 							 ;
 
@@ -128,7 +128,7 @@ tipo : Caracter
 
 instruccion : Esperar ins_esperar TOKEN_PYC
 				| ins_borrar Pantalla TOKEN_PYC
-				| Escribir expresion lista_expr TOKEN_PYC
+				| Escribir expresion_logica lista_expr TOKEN_PYC
 				| Leer id lista_id_o_llamado TOKEN_PYC
 				;
 ins_borrar : Borrar
@@ -151,14 +151,14 @@ con_paso : Con Paso expresion
 			;
 ciclo_mientras: expresion_logica Hacer cuerpo Finmientras;
 ciclo_repetir : cuerpo Hasta Que expresion_logica;
-segun_hacer : expresion Hacer casos de_otro_modo Finsegun;
+segun_hacer : Segun ID Hacer casos de_otro_modo Finsegun;
 de_otro_modo : De Otro Modo TOKEN_DOSP cuerpo
 				|
 				;
 casos : caso_segun casos
 		|
 		;
-caso_segun : Caso expresion TOKEN_DOSP cuerpo ;
+caso_segun : Caso expresion_logica TOKEN_DOSP cuerpo ;
 
 
 COMMENT 		: '/*' .*? '*/' -> skip ;

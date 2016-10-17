@@ -39,7 +39,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 	@Override
 	public T visitInstruccion(InstruccionContext ctx) {
 		if(ctx.Escribir() != null){
-			
+			Object ans = visitExpresion(ctx.expresion());	
 			//id			
 			//entero
 			//real
