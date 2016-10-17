@@ -1,18 +1,6 @@
-proceso sin_titulo
-    definir i,j,k como entero;
-   
-    para i<-0 hasta 9 hacer
-        para j<-0 hasta 9 con paso 1 hacer
-            para k<-0 hasta 9 hacer
-                si i*i + j*j + k*k = i*i*i entonces
-                    escribir i*i*i;
-                finsi
-            finpara
-        finpara
-    finpara
-finproceso
-
-proceso sin_titulo
- si i*i + j*j + k*k = i*i*i entonces
-                    escribir i*i*i;
-finproceso
+Proceso mi_proces
+	Definir i Como entero;
+	para i<-20 hasta 15 Con Paso -1 hacer
+		Escribir i;
+	FinPara
+FinProceso

@@ -83,7 +83,8 @@ expresion_logica	: TOKEN_NEG expresion_logica
 									| expresion
 									;
 
-expresion	: expresion TOKEN_POT expresion
+expresion	:	TOKEN_MENOS expresion
+					| expresion TOKEN_POT expresion
 					| expresion MULOP expresion
 					| expresion SUMOP expresion
 					| constante
@@ -230,7 +231,7 @@ RELOP	: TOKEN_MENOR
 IODOP	: TOKEN_IGUAL
 			| TOKEN_DIF
 			;
-
+TOKEN_MENOS : '-';	
 SUMOP : TOKEN_MAS | TOKEN_MENOS;
 MULOP : TOKEN_MUL | TOKEN_DIV | TOKEN_MOD;
 
@@ -258,7 +259,7 @@ TOKEN_NEG : '~'
 TOKEN_IGUAL : '='
 			| '==';
 TOKEN_MAS : '+';
-TOKEN_MENOS : '-';
+
 TOKEN_DIV : '/';
 TOKEN_MUL : '*';
 TOKEN_MOD : '%'
