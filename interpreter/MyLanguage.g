@@ -126,7 +126,7 @@ tipo : Caracter
 
 instruccion : Esperar ins_esperar TOKEN_PYC
 				| ins_borrar Pantalla TOKEN_PYC
-				| Escribir expresion_logica lista_expr TOKEN_PYC
+				| Escribir lista_expr TOKEN_PYC
 				| Leer id lista_id_o_llamado TOKEN_PYC
 				;
 ins_borrar : Borrar
@@ -135,9 +135,8 @@ ins_borrar : Borrar
 ins_esperar : Tecla
 				| expresion Segundos
 				;
-lista_id_o_llamado : TOKEN_COMA id lista_id_o_llamado
-					|
-					;
+lista_id_o_llamado : id (TOKEN_COMA id)*	;
+
 condicional_si : expresion_logica Entonces cuerpo si_no Finsi;
 
 si_no : Sino cuerpo
@@ -155,7 +154,7 @@ segun_hacer :  id Hacer casos de_otro_modo Finsegun;
 de_otro_modo : De Otro Modo TOKEN_DOSP cuerpo
 				|
 				;
-casos : caso_segun (caso_segun)* 
+casos : caso_segun (caso_segun)*
 		|
 		;
 caso_segun : Caso expresion_logica TOKEN_DOSP cuerpo ;
@@ -211,7 +210,6 @@ Finfuncion : 'finfuncion';
 De : 'de';
 Otro : 'otro';
 Modo : 'modo';
-Mod : 'mod';
 Subproceso : 'subproceso';
 Finsubproceso : 'finsubproceso';
 Borrar : 'borrar';
@@ -261,7 +259,7 @@ TOKEN_MAS : '+';
 TOKEN_DIV : '/';
 TOKEN_MUL : '*';
 TOKEN_MOD : '%'
-			| Mod
+			| 'mod'
 			;
 TOKEN_DOSP : ':';
 TOKEN_POT : '^';
