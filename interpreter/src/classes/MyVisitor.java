@@ -47,6 +47,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		}
 		return true;
 	}
+ 
 	
 	
 	
@@ -67,6 +68,30 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		//TODO
 		return super.visitInstruccion(ctx);
 	}
+	
+	public int comparar (Object var1, Object var2){
+		if(var1 instanceof String && var2 instanceof String){
+			return ((String)var1).compareTo((String)var2);
+		}
+		else if(var1 instanceof Double && var2 instanceof Double){
+			return ((Double)var1).compareTo((Double)var2);
+		}
+		else if(var1 instanceof Double && var2 instanceof Integer){
+			return ((Double)var1).compareTo(((Integer)var2).doubleValue());
+		}
+		else if(var1 instanceof Integer && var2 instanceof Double){
+			return Double.valueOf( ( (Integer)var1 ).doubleValue()  ).compareTo((Double)var2);
+		}
+		else if(var1 instanceof Integer && var2 instanceof Integer){
+			return ((Integer) var1).compareTo(  (Integer)var2 );
+		}
+		else if(var1 instanceof Boolean && var2 instanceof Boolean){
+			return ((Boolean)var1).compareTo((Boolean)var2);
+		}
+		else{
+			return Integer.MIN_VALUE;
+		}
+	}
 	@Override
 	public T visitExpresion_logica(Expresion_logicaContext ctx) {
 		Boolean ans = null;
@@ -81,28 +106,174 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			
 			//TODO manejar error
 			
-			if(var1 instanceof String){
-				
-			}
-			else if(var1 instanceof Integer){
-				
-			}
-			else if(var1 instanceof Double){
-				
-			}
-			else if(var1 instanceof Boolean){
-				
-			}
-			
-			
 			switch(op){
 			case "<":
-				
+				ans = comparar(var1, var2) < 0;
+				break;
+			case ">":
+				ans = comparar(var1, var2) >0;
+				break;
+			case ">=":
+				ans = (comparar(var1, var2) > 0 || comparar(var1, var2) == 0);
+				break;
+			case "<=":
+				ans = (comparar(var1, var2) <0  || comparar(var1, var2) == 0);
+				break;		
+			}		
+			return (T)ans;
+		}
+		else if(ctx.IODOP() != null){
+			String op = ctx.IODOP().getText();
+			Object var1 = visitExpresion_logica(ctx.expresion_logica(0));
+			Object var2 = visitExpresion_logica(ctx.expresion_logica(1));
+			
+			//TODO manejar error
+			
+			switch(op){
+			case "=":
+			case "==":
+				ans = (comparar(var1, var2) == 0);
+				break;
+			case "<>":
+				ans = (comparar(var1, var2) != 0);
+				break;	
 			}
-				
+			return (T)ans;
+		}
+		else if(ctx.TOKEN_Y() != null){
+			Object var1 = visitExpresion_logica(ctx.expresion_logica(0));
+			Object var2 = visitExpresion_logica(ctx.expresion_logica(1));
+			
+			
+			//TODO manejo errores
+			ans = (Boolean)var1 && (Boolean)var2;
+			return (T)ans;
 			
 		}
+		else if(ctx.TOKEN_O() != null){
+			Object var1 = visitExpresion_logica(ctx.expresion_logica(0));
+			Object var2 = visitExpresion_logica(ctx.expresion_logica(1));
+			
+			//TODO manejo errores
+			ans = (Boolean)var1 || (Boolean)var2;
+			return (T)ans;
+		}
+		else if(ctx.TOKEN_PAR_IZQ() != null)
+			return visitExpresion_logica(ctx.expresion_logica(0));
+		else if(ctx.expresion() != null){
+			return visitExpresion(ctx.expresion());
+		}
+		
 		return super.visitExpresion_logica(ctx);
+	}
+	
+	public boolean validForMath(Object a){
+		 if(a instanceof Integer || a instanceof Double)
+			 return true;
+		 return false;
+	}
+	@Override
+	public T visitExpresion(ExpresionContext ctx) {
+		Object ans = null;
+		if(ctx.TOKEN_MENOS() != null){
+			ans = visitExpresion(ctx.expresion(0));
+			if(! validForMath(ans)  ){
+				int line = ctx.getStart().getLine();
+				int column = ctx.getStart().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico, los tipos no coinciden", line, column);
+				System.exit(-1);
+			}
+			if(ans instanceof Double){
+				ans = -( (Double)ans );
+				return (T)ans;
+			}
+			if(ans instanceof Integer){
+				ans = -((Integer)ans);
+				return (T)ans;
+			}
+		}
+		if(ctx.TOKEN_POT() != null){
+			Object var1 = visitExpresion(ctx.expresion(0));
+			Object var2 = visitExpresion(ctx.expresion(1));
+			if(! validForMath(var1) || !validForMath(var2) ){
+				int line = ctx.getStart().getLine();
+				int column = ctx.getStart().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico, los tipos no coinciden", line, column);
+				System.exit(-1);
+			}
+			if(var1 instanceof Double && var2 instanceof Double)
+					ans = Math.pow((Double)var1,(Double)var2 );
+			else if(var1 instanceof Double && var2 instanceof Integer)
+					ans = Math.pow( (Double)var1, (Integer)var2 );
+			else if(var1 instanceof Integer && var2 instanceof Integer)
+					ans = Math.pow((Integer)var1, (Double)var2);
+			else
+				ans = Math.pow((Integer)var1, (Integer)var2);
+			return (T)ans;
+		}
+		if(ctx.MULOP() != null){
+			Object var1 = visitExpresion(ctx.expresion(0));
+			Object var2 = visitExpresion(ctx.expresion(1));
+			String op = ctx.MULOP().getText();
+			if(! validForMath(var1) || !validForMath(var2) ){
+				int line = ctx.getStart().getLine();
+				int column = ctx.getStart().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico, los tipos no coinciden", line, column);
+				System.exit(-1);
+			}
+			
+			switch(op){
+			case "*":
+				if(var1 instanceof Double && var2 instanceof Double)
+					ans = (Double)var1 * (Double)var2;
+				else if(var1 instanceof Double && var2 instanceof Integer)
+					ans = (Double)var1 * (Integer)var2;
+				else if(var1 instanceof Integer && var2 instanceof Integer)
+					ans = (Integer)var1 * (Double)var2;
+				else
+					ans = (Integer)var1 * (Integer)var2;
+				break;
+			case "/":
+				if(var2 instanceof Double && ((Double)var2).equals(Double.valueOf(0))){
+					int line= ctx.getStart().getLine();
+					int column = ctx.getStart().getCharPositionInLine() + 1;
+					System.err.printf("<%d:%d> Error semantico, division entre 0", line, column);
+					System.exit(-1);
+				}
+				
+				if(var2 instanceof Integer && ((Integer)var2).equals(Integer.valueOf(0))){
+					int line= ctx.getStart().getLine();
+					int column = ctx.getStart().getCharPositionInLine() + 1;
+					System.err.printf("<%d:%d> Error semantico, division entre 0", line, column);
+					System.exit(-1);
+				}
+				
+				if(var1 instanceof Double && var2 instanceof Double)
+					ans = (Double)var1 / (Double)var2;
+				else if(var1 instanceof Double && var2 instanceof Integer)
+					ans = (Double)var1 / (Integer)var2;
+				else if(var1 instanceof Integer && var2 instanceof Integer)
+					ans = (Integer)var1 / (Double)var2;
+				else
+					ans = (Integer)var1 / (Integer)var2;
+				break;
+			case "mod":
+			case "%":
+				if(var1 instanceof Double && var2 instanceof Double)
+					ans = (Double)var1 % (Double)var2;
+				else if(var1 instanceof Double && var2 instanceof Integer)
+					ans = (Double)var1 % (Integer)var2;
+				else if(var1 instanceof Integer && var2 instanceof Integer)
+					ans = (Integer)var1 % (Double)var2;
+				else
+					ans = (Integer)var1 % (Integer)var2;
+				break;
+			}
+			return (T)ans;
+		}
+		
+		//TODO queda pendiente en expresion calcular sumas y restas, constantes, ids y parentesis
+		return super.visitExpresion(ctx);
 	}
 	
 	

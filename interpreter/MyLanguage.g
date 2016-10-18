@@ -70,9 +70,7 @@ llamar_o_asignar : asignar
 				| pars_fun
 				;
 asignar : TOKEN_ASIG expresion_logica;
-lista_expr : TOKEN_COMA expresion_logica lista_expr
-			|
-			;
+lista_expr : expresion_logica (TOKEN_COMA expresion_logica)*	;
 
 expresion_logica	: TOKEN_NEG expresion_logica
 									| expresion_logica RELOP expresion_logica
@@ -151,11 +149,13 @@ con_paso : Con Paso expresion
 			;
 ciclo_mientras: expresion_logica Hacer cuerpo Finmientras;
 ciclo_repetir : cuerpo Hasta Que expresion_logica;
+
 segun_hacer :  id Hacer casos de_otro_modo Finsegun;
+
 de_otro_modo : De Otro Modo TOKEN_DOSP cuerpo
 				|
 				;
-casos : caso_segun casos
+casos : caso_segun (caso_segun)* 
 		|
 		;
 caso_segun : Caso expresion_logica TOKEN_DOSP cuerpo ;
@@ -164,8 +164,6 @@ caso_segun : Caso expresion_logica TOKEN_DOSP cuerpo ;
 COMMENT 		: '/*' .*? '*/' -> skip ;
 LINE_COMMENT 	: '//' ~[\r\n]* -> skip ;
 WS		: [ \t\r\n]+ -> skip ;
-
-
 
 Verdadero : 'verdadero';
 Falso : 'falso';
