@@ -271,8 +271,46 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			}
 			return (T)ans;
 		}
+		if(ctx.SUMOP() != null){
+			Object var1 = visitExpresion(ctx.expresion(0));
+			Object var2 = visitExpresion(ctx.expresion(1));
+			String op = ctx.MULOP().getText();
+			if(! validForMath(var1) || !validForMath(var2) ){
+				int line = ctx.getStart().getLine();
+				int column = ctx.getStart().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico, los tipos no coinciden", line, column);
+				System.exit(-1);
+			}
+			switch(op){
+			case "+":
+				if(var1 instanceof Double && var2 instanceof Double)
+					ans = (Double)var1 + (Double)var2;
+				else if(var1 instanceof Double && var2 instanceof Integer)
+					ans = (Double)var1 + (Integer)var2;
+				else if(var1 instanceof Integer && var2 instanceof Integer)
+					ans = (Integer)var1 + (Double)var2;
+				else
+					ans = (Integer)var1 + (Integer)var2;
+				break;
+			case "-":
+				if(var1 instanceof Double && var2 instanceof Double)
+					ans = (Double)var1 - (Double)var2;
+				else if(var1 instanceof Double && var2 instanceof Integer)
+					ans = (Double)var1 - (Integer)var2;
+				else if(var1 instanceof Integer && var2 instanceof Integer)
+					ans = (Integer)var1 - (Double)var2;
+				else
+					ans = (Integer)var1 - (Integer)var2;
+				break;
+			}
+		}
+		if(ctx.TOKEN_PAR_IZQ() != null)
+			return visitExpresion(ctx.expresion(0));
+		if(ctx.constante() != null){
+			
+		}
 		
-		//TODO queda pendiente en expresion calcular sumas y restas, constantes, ids y parentesis
+		//TODO queda pendiente en expresi1on calcular constantes e ids 
 		return super.visitExpresion(ctx);
 	}
 	
