@@ -9,6 +9,10 @@ import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 import java.awt.print.Book;
 import java.io.*;
 
+import classes.MyLanguageParser.Ciclo_mientrasContext;
+import classes.MyLanguageParser.Ciclo_paraContext;
+import classes.MyLanguageParser.Ciclo_repetirContext;
+import classes.MyLanguageParser.Condicional_siContext;
 import classes.MyLanguageParser.ExpresionContext;
 import classes.MyLanguageParser.Expresion_logicaContext;
 import classes.MyLanguageParser.GenerarprocesoContext;
@@ -21,7 +25,7 @@ import classes.MyLanguageParser.ProgramaContext;
 public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 
 	BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-	PrintWriter output = new PrintWriter(System.out);
+	//PrintWriter output = new PrintWriter(System.out);
 	
 	//symbol table
 	public Stack<HashMap <String, Variable> > table = new Stack<HashMap <String, Variable>>();
@@ -145,8 +149,9 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			for(Expresion_logicaContext x : ctx.lista_expr().expresion_logica()){
 				toOut += visitExpresion_logica(x).toString();
 				toOut += " ";
+				System.out.println(toOut);
 			}
-			output.println(toOut);
+			System.out.println("esto es de out" + toOut);
 		}
 		if(ctx.Leer() != null){
 				for(IdContext x: ctx.lista_id_o_llamado().id()){
@@ -475,6 +480,88 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			return (T)ans;
 		}
 		return super.visitExpresion(ctx);
+	}
+	
+	@Override
+	public T visitCondicional_si(Condicional_siContext ctx) {
+		// TODO Auto-generated method stub
+		table.push(new HashMap<String, Variable>());
+		Boolean ans = (Boolean)visitExpresion_logica(ctx.expresion_logica());
+		if(ans){
+			visitCuerpo(ctx.cuerpo());
+		}
+		else{
+			visitSi_no(ctx.si_no());
+		}
+		table.pop();
+		return super.visitCondicional_si(ctx);
+	}
+	
+	// TODO visitCuerpo
+	
+	@Override
+	public T visitCiclo_para(Ciclo_paraContext ctx) {
+		// TODO Auto-generated method stub
+		table.push(new HashMap<String, Variable>());
+		Object num, hasta, paso;
+		if(ctx.ID()!=null){
+			
+			num = visitExpresion(ctx.expresion());
+			if(num instanceof Integer){
+				num = (Integer)num;
+			}
+			else if(num instanceof Double){
+				num = (Double)num;
+				num = ((Double) num).intValue();
+			}
+			
+			hasta = visitExpresion_logica(ctx.expresion_logica());
+			if(hasta instanceof Integer){
+				hasta = (Integer)hasta;
+			}
+			else if(hasta instanceof Double){
+				hasta = (Double)hasta;
+				hasta = ((Double) hasta).intValue();
+			}	
+			
+			paso = visitCon_paso(ctx.con_paso());
+			if(paso instanceof Integer){
+				paso = (Integer)paso;
+			}
+			else if(paso instanceof Double){
+				paso = (Double)paso;
+				paso = ((Double) paso).intValue();
+			}
+			
+			for (int i = Integer.valueOf((Integer) num); i < Integer.valueOf((Integer) hasta); i += Integer.valueOf((Integer) paso)) {
+				visitCuerpo(ctx.cuerpo());
+			}
+		}
+		table.pop();
+		return super.visitCiclo_para(ctx);
+	}
+	
+	@Override
+	public T visitCiclo_mientras(Ciclo_mientrasContext ctx) {
+		// TODO Auto-generated method stub
+		table.push(new HashMap<String, Variable>());
+		Boolean ans = (Boolean)visitExpresion_logica(ctx.expresion_logica());
+		while(ans){
+			visitCuerpo(ctx.cuerpo());
+		}table.pop();
+		return super.visitCiclo_mientras(ctx);
+	}
+	
+	@Override
+	public T visitCiclo_repetir(Ciclo_repetirContext ctx) {
+		// TODO Auto-generated method stub
+		table.push(new HashMap<String, Variable>());
+		Boolean ans = (Boolean)visitExpresion_logica(ctx.expresion_logica());
+		do{
+			visitCuerpo(ctx.cuerpo());
+		}while(ans);
+		table.pop();
+		return super.visitCiclo_repetir(ctx);
 	}
 	
 	public class Variable{
