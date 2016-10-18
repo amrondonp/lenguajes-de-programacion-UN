@@ -69,13 +69,34 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 	 * */
 	public Variable find(String id){
 		boolean found = false;
-		Stack<HashMap <String, Variable> > temporal_table = table;
-		while(!temporal_table.isEmpty() && !found){
-			found |= temporal_table.peek().containsKey(id);
-			if(!found) temporal_table.pop();
+		Stack<HashMap <String, Variable> > temporal_table = new Stack<HashMap<String, Variable> >();
+		while(!table.isEmpty() && !found){
+			found |= table.peek().containsKey(id);
+			if(!found) temporal_table.push(table.pop());
+		}
+		Variable ans = (found ? temporal_table.peek().get(id) : null );
+		while(!temporal_table.isEmpty()){
+			table.push(temporal_table.pop());
 		}
 		
-		return (found ? temporal_table.peek().get(id) : null );
+		return ans; 
+	}
+	
+	public void setVar(String id, Object value){
+		boolean found = false;
+		Stack<HashMap <String, Variable> > temporal_table = new Stack<HashMap<String, Variable> >();
+		while(!table.isEmpty() && !found){
+			found |= table.peek().containsKey(id);
+			if(!found){
+				temporal_table.push(table.pop());
+			}
+		}
+		if(found){
+			table.peek().get(id).valor = value;
+		}
+		while(!temporal_table.isEmpty()){
+			table.push(temporal_table.pop());
+		}
 	}
 	/* revisa que los simbolos en una expresion sean correctos
 	 * @param objetos a y b
@@ -136,6 +157,9 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 						System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ x.ID().getText() + " no ha sido declarada", line, column);
 						System.exit(-1);
 					}
+					//TODO
+					
+					
 				}
 		}
 		
