@@ -1,3 +1,7 @@
 proceso b
 definir a como real;
+dimension a[2];
+a[0] <- 30.0; 
+a[1] <- 20.0;
+escribir a[0], a[1];
 finproceso

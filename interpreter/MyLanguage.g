@@ -40,8 +40,8 @@ finalizarproceso : Finproceso
 		   ;
 
 
-cuerpo 	: Definir definicion cuerpo
-		| instruccion cuerpo
+cuerpo 	: Definir definicion cuerpo  //ya
+		| instruccion cuerpo  //falta esperar
 		| Dimension dimensionar cuerpo
 		| Si condicional_si cuerpo
 		| Para ciclo_para cuerpo
@@ -115,17 +115,17 @@ tipo : Caracter
 							| pars_fun
 							;
 		pars_fun : TOKEN_PAR_IZQ pars_lista TOKEN_PAR_DER;
-		pars_lista : expresion_logica lista_expr
+		pars_lista : lista_expr
 							 |
 							 ;
 
-		acceder_arreglo : TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER ;
+		acceder_arreglo : TOKEN_COR_IZQ lista_expr TOKEN_COR_DER ;
 
 
 instruccion : Esperar ins_esperar TOKEN_PYC
 				| ins_borrar Pantalla TOKEN_PYC
 				| Escribir lista_expr TOKEN_PYC
-				| Leer id lista_id_o_llamado TOKEN_PYC
+				| Leer lista_id_o_llamado TOKEN_PYC
 				;
 ins_borrar : Borrar
 			| Limpiar

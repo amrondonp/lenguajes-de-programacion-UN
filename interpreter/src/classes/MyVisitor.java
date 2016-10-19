@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
 
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.sun.xml.internal.bind.v2.model.core.ID;
@@ -13,6 +14,7 @@ import java.awt.print.Book;
 import java.io.*;
 
 import classes.MyLanguageParser.ArregloContext;
+import classes.MyLanguageParser.Asignacion_llamadoContext;
 import classes.MyLanguageParser.Caso_segunContext;
 import classes.MyLanguageParser.Ciclo_mientrasContext;
 import classes.MyLanguageParser.Ciclo_paraContext;
@@ -46,33 +48,42 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		 return false;
 	}
 		
+	
 	@Override
+	public T visitPrograma(ProgramaContext ctx) {
+		table.push(new HashMap<String, Variable>());
+		Object a = super.visitPrograma(ctx);
+		table.pop();
+		return (T)a;
+	}
 	public T visitId(IdContext ctx) {
 		
 		Variable var = find(ctx.ID().getText());
-		
-		//no existe id
-		if(var == null){
-			int line = ctx.getStart().getLine();
-			int column = ctx.getStart().getCharPositionInLine() + 1;
-			System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ ctx.ID().getText() + " no ha sido declarada", line, column);
-			System.exit(-1);
-		}
-		//id no incializado
-		if(!var.inicializado){
-			int line = ctx.getStart().getLine();
-			int column = ctx.getStart().getCharPositionInLine() + 1;
-			System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ ctx.ID().getText() + " no ha sido inicializada", line, column);
-			System.exit(-1);
-		}
 		
 		if(!var.arreglo ){
 			Object ob = var.valor;
 			return (T)ob;
 		}
-		return super.visitId(ctx);
+		else if(var.arreglo){
+			ArrayList<Integer> index = new ArrayList<Integer>();
+			for(Expresion_logicaContext x: ctx.llamado().acceder_arreglo().lista_expr().expresion_logica() ){
+				Object ans = visitExpresion_logica(x);
+				if(ans instanceof Boolean || ans instanceof String){
+					int line = x.getStart().getLine();
+					int column = x.getStart().getCharPositionInLine() + 1;
+					System.err.printf("<%d,%d> Error semantico: tipos de datos incompatibles. Se esperaba: entero; se encontro "+ ans.getClass().toString() +".", line,column);
+					System.exit(-1);
+				}
+				
+				index.add((Integer)ans);
+				
+				Object obj = var.getFromArray(index);
+				return (T)obj;
+			}
+		}
+		return null;
 	
-		//TODO arreglos
+		
 		//TODO llamado funciones
 		
 	}
@@ -88,7 +99,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			found |= table.peek().containsKey(id);
 			if(!found) temporal_table.push(table.pop());
 		}
-		Variable ans = (found ? temporal_table.peek().get(id) : null );
+		Variable ans = (found ? table.peek().get(id) : null );
 		while(!temporal_table.isEmpty()){
 			table.push(temporal_table.pop());
 		}
@@ -107,6 +118,25 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		}
 		if(found){
 			table.peek().get(id).valor = value;
+			table.peek().get(id).inicializado = true;
+		}
+		while(!temporal_table.isEmpty()){
+			table.push(temporal_table.pop());
+		}
+	}
+	
+	public void setVarArray(String id, Object value, ArrayList<Integer> index){
+		boolean found = false;
+		Stack<HashMap <String, Variable> > temporal_table = new Stack<HashMap<String, Variable> >();
+		while(!table.isEmpty() && !found){
+			found |= table.peek().containsKey(id);
+			if(!found){
+				temporal_table.push(table.pop());
+			}
+		}
+		if(found){
+			table.peek().get(id).setObjectInArray(index, value);
+			table.peek().get(id).inicializado = true;
 		}
 		while(!temporal_table.isEmpty()){
 			table.push(temporal_table.pop());
@@ -179,7 +209,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			table.peek().put(x.getText(), var); 
 			
 		}
-		return super.visitDefinicion(ctx);
+		return null;
 	}
 	
 	
@@ -189,7 +219,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		for( ArregloContext x: ctx.lista_arreglos().arreglo()){
 			visitArreglo(x);
 		}
-		return super.visitDimensionar(ctx);
+		return null;
 	}
 
 	@Override
@@ -201,7 +231,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			tamanos.add(tam);			
 		}
 		setDim(id, tamanos);
-		return super.visitArreglo(ctx);
+		return null;
 	}
 	
 	@Override
@@ -215,18 +245,9 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		else if(ctx.Logico() != null)
 			return (T)"logico";
 		else
-			return super.visitTipo(ctx);
+			return null;
 	}
 	
-	
-	
-	@Override
-	public T visitGenerarproceso(GenerarprocesoContext ctx) {
-		table.push(new HashMap<String, Variable>());
-		visitChildren(ctx);
-		table.pop();
-		return super.visitGenerarproceso(ctx);
-	}
 	
 	@Override
 	public T visitInstruccion(InstruccionContext ctx) {
@@ -234,29 +255,169 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		if(ctx.Escribir() != null){
 			String toOut = new String("");
 			for(Expresion_logicaContext x : ctx.lista_expr().expresion_logica()){
+				
+				if(x.expresion().id() != null){
+					if(!find(x.expresion().id().ID().getText()).inicializado){
+						int line = x.expresion().id().ID().getSymbol().getLine();
+						int column = x.expresion().id().ID().getSymbol().getCharPositionInLine() + 1;
+						System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ x.expresion().id().ID().getText() + " no ha sido inicializada", line, column);
+						System.exit(-1);
+					}
+				}
+				
 				toOut += visitExpresion_logica(x).toString();
 				toOut += " ";
-				//System.out.println(toOut);
 			}
 			System.out.println(toOut);
 		}
 		if(ctx.Leer() != null){
-				for(IdContext x: ctx.lista_id_o_llamado().id()){
-					Variable var = find(x.ID().getText());
+				for( IdContext x: ctx.lista_id_o_llamado().id()){
+					Object value = null;
+					Variable var = find(x.getText());
 					if(var == null){
-						int line = ctx.getStart().getLine();
-						int column = ctx.getStart().getCharPositionInLine() + 1;
-						System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ x.ID().getText() + " no ha sido declarada", line, column);
+						int line = x.ID().getSymbol().getLine();
+						int column = x.ID().getSymbol().getCharPositionInLine() + 1;
+						System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ x.getText() + " no ha sido declarada", line, column);
 						System.exit(-1);
 					}
-					//TODO
 					
+									
+					String tipo = var.tipo;
+					
+					if(tipo.equals("entero")){
+						try {
+							value = (Integer)(Integer.parseInt(in.readLine()));
+						} catch (NumberFormatException e) {
+
+							e.printStackTrace();
+						} catch (IOException e) {
+							
+							e.printStackTrace();
+						}
+					}
+					else if(tipo.equals("cadena")){
+						try {
+							value = in.readLine();
+						} catch (IOException e) {
+				
+							e.printStackTrace();
+						}
+					}
+					else if(tipo.equals("real")){
+						try {
+							value = (Double)(Double.parseDouble(in.readLine()));
+						} catch (NumberFormatException | IOException e) {
+						
+							e.printStackTrace();
+						}
+					}
+					else if(tipo.equals("logico")){
+						try {
+							value = (Boolean)(Boolean.parseBoolean(in.readLine()));
+						} catch (IOException e) {
+
+							e.printStackTrace();
+						}
+					}
+					if(var.arreglo){
+						if(x.llamado().acceder_arreglo() == null){
+							int line = x.ID().getSymbol().getLine();
+							int column = x.ID().getSymbol().getCharPositionInLine() + 1;
+							System.err.printf("<%d,%d> Error semantico: La variable "+x.ID().getText()+ " es un arreglo.", line,column);
+							System.exit(-1);
+						}
+						ArrayList<Integer> index = new ArrayList<Integer>();
+						for( Expresion_logicaContext y: x.llamado().acceder_arreglo().lista_expr().expresion_logica()){
+							Object temp = visitExpresion_logica(y);
+							if(temp instanceof Boolean || temp instanceof String){
+								int line = y.getStart().getLine();
+								int column = y.getStart().getCharPositionInLine() + 1;
+								System.err.printf("<%d,%d> Error semantico: tipos de datos incompatibles. Se esperaba: entero; se encontro "+ temp.getClass().toString() +".", line,column);
+								System.exit(-1);
+							}
+							
+							index.add((Integer)temp);
+						}
+						
+						setVarArray(x.ID().getText(), value, index);
+						
+					}
+					else if(!var.arreglo){
+						setVar(x.getText(), value);
+					}
 					
 				}
 		}
+		else if(ctx.Esperar() != null){
+			//TODO
+		}
 		
-		//TODO 
-		return super.visitInstruccion(ctx);
+		
+		return null;
+	}
+	
+	@Override
+	public T visitAsignacion_llamado(Asignacion_llamadoContext ctx) {
+		if(ctx.llamar_o_asignar().asignar() != null){
+			Variable var = find(ctx.ID().getText());
+			Object value = null;
+			value = visitExpresion_logica(ctx.llamar_o_asignar().asignar().expresion_logica());
+			
+			if(var == null){
+				int line = ctx.ID().getSymbol().getLine();
+				int column = ctx.ID().getSymbol().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ ctx.ID().getText() + " no ha sido declarada", line, column);
+				System.exit(-1);
+			}
+			String tipovar = var.tipo;
+			
+			
+			String tipo;
+			if(value instanceof Double)
+				tipo = new String("real");
+			else if(value instanceof Integer)
+				tipo = new String("entero");
+			else if(value instanceof String)
+				tipo = new String("cadena");
+			else
+				tipo = new String("logico");	
+			
+			if(!tipovar.equals(tipo)){
+				int line = ctx.getStart().getLine();
+				int column = ctx.getStart().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico: tipos de datos incompatible. Se esperaba: " + tipovar+ "; se encontro: " + tipo, line, column);
+				System.exit(-1);
+			}
+			if(var.arreglo){
+				if(ctx.llamar_o_asignar().acceder_arreglo() == null){
+					int line = ctx.ID().getSymbol().getLine();
+					int column = ctx.ID().getSymbol().getCharPositionInLine() + 1;
+					System.err.printf("<%d,%d> Error semantico: La variable "+ ctx.ID().getText()+ " es un arreglo.", line,column);
+					System.exit(-1);
+				}
+				ArrayList<Integer> index = new ArrayList<Integer>();
+				for( Expresion_logicaContext y: ctx.llamar_o_asignar().acceder_arreglo().lista_expr().expresion_logica()){
+					Object temp = visitExpresion_logica(y);
+					if(temp instanceof Boolean || temp instanceof String){
+						int line = y.getStart().getLine();
+						int column = y.getStart().getCharPositionInLine() + 1;
+						System.err.printf("<%d,%d> Error semantico: tipos de datos incompatibles. Se esperaba: entero; se encontro "+ temp.getClass().toString() +".", line,column);
+						System.exit(-1);
+					}
+					
+					index.add((Integer)temp);
+				}
+				
+				setVarArray(ctx.ID().getText(), value, index);
+				
+			}
+			else if(!var.arreglo){
+				setVar(ctx.ID().getText(), value);
+			}
+			
+		}
+		
+		return null;
 	}
 	
 	public int comparar (Object var1, Object var2){
@@ -306,7 +467,6 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			if(! correctTypes(var1, var2)){
 				int line = ctx.getStart().getLine();
 				int column = ctx.getStart().getCharPositionInLine() + 1;
-				//TODO Manejo de errores
 				System.err.printf("<%d:%d> Error semantico: tipos de datos incompatible. Se esperaba: logico; se encontro: " + tipo(var2), line, column);
 				System.exit(-1);
 			}
@@ -394,7 +554,7 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			return visitExpresion(ctx.expresion());
 		}
 		
-		return super.visitExpresion_logica(ctx);
+		return null;
 	}
 	
 
@@ -561,13 +721,23 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			return (T)ans;
 		}
 		
-		//TODO queda pendiente en expresi1on calcular ids
 		if(ctx.id() != null){
+			Variable var = find(ctx.id().ID().getText());
+			//no existe id
+			if(var == null){
+				int line = ctx.id().ID().getSymbol().getLine();
+				int column = ctx.id().ID().getSymbol().getCharPositionInLine() + 1;
+				System.err.printf("<%d:%d> Error semantico, la variable con nombre "+ ctx.id().ID().getText() + " no ha sido declarada", line, column);
+				System.exit(-1);
+			}
 			ans = visitId(ctx.id());
+			
+			
 			return (T)ans;
 		}
-		return super.visitExpresion(ctx);
+		return null;
 	}
+	
 	
 	@Override
 	public T visitCondicional_si(Condicional_siContext ctx) {
@@ -575,23 +745,21 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		if(condicion){
 			System.out.println("entre a si");
 			visitCuerpo(ctx.cuerpo());
-			return super.visitCondicional_si(ctx);
 		}
-		else {
+		else if(ctx.si_no().cuerpo() != null) {
 			System.out.println("entre a else");
-			visitSi_no(ctx.si_no());
-			return super.visitCondicional_si(ctx);
+			visitCuerpo(ctx.si_no().cuerpo());
+			
 		}
-		
+		return null;
 		
 	}
 	
-	// TODO visitCuerpo
 	
 	@Override
 	public T visitCiclo_para(Ciclo_paraContext ctx) {
 		// TODO Auto-generated method stub
-		table.push(new HashMap<String, Variable>());
+
 		Object num, hasta, paso;
 		if(ctx.ID()!=null){
 			
@@ -626,19 +794,19 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 				visitCuerpo(ctx.cuerpo());
 			}
 		}
-		table.pop();
-		return super.visitCiclo_para(ctx);
+	
+		return null;
 	}
 	
 	@Override
 	public T visitCiclo_mientras(Ciclo_mientrasContext ctx) {
-		// TODO Auto-generated method stub
-		table.push(new HashMap<String, Variable>());
+
+
 		Boolean ans = (Boolean)visitExpresion_logica(ctx.expresion_logica());
 		while(ans){
 			visitCuerpo(ctx.cuerpo());
-		}table.pop();
-		return super.visitCiclo_mientras(ctx);
+		}
+		return null;
 	}
 	@Override
 	public T visitCuerpo(CuerpoContext ctx) {
@@ -692,19 +860,18 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			visitDe_otro_modo(ctx.de_otro_modo());
 		}
 		
-		return super.visitSegun_hacer(ctx);
+		return null;
 	}
 	
 	@Override
 	public T visitCiclo_repetir(Ciclo_repetirContext ctx) {
-		// TODO Auto-generated method stub
-		table.push(new HashMap<String, Variable>());
+
 		Boolean ans = (Boolean)visitExpresion_logica(ctx.expresion_logica());
 		do{
 			visitCuerpo(ctx.cuerpo());
 		}while(ans);
-		table.pop();
-		return super.visitCiclo_repetir(ctx);
+	
+		return null;
 	}
 	
 	public class Variable{
@@ -714,12 +881,15 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 		public boolean arreglo;
 		public int dimensiones;
 		public ArrayList<Integer> tamanos;
+		public boolean funcion;
+		public Object[] array;
 		
 		public Variable() {
 			this.tipo = tipo;
 			this.inicializado = inicializado;
 			this.dimensiones = 0;
 			this.arreglo = false;
+			this.funcion = false;
 		}
 		
 		public void setValor(Object valor){
@@ -737,6 +907,55 @@ public class MyVisitor<T> extends MyLanguageBaseVisitor<T>{
 			this.arreglo = true;
 			this.dimensiones = dimensiones;
 			this.tamanos = tamanos;
+			
+			Integer tam = new Integer(tamanos.get(0));
+			for(int i = 1; i < tamanos.size(); i++){
+				tam *= tamanos.get(i);
+			}
+			
+			if(tipo.equals("entero")){
+				this.array = new Integer[tam];
+			}
+			if(tipo.equals("caracter")){
+				this.array = new String[tam];
+			}
+			if(tipo.equals("real")){
+				this.array = new Double[tam];
+			}
+			if(tipo.equals("logico")){
+				this.array = new Double[tam];
+			}
+			
+		}
+		
+		public Object getFromArray(ArrayList<Integer> index){
+			Object ans = null;
+			Integer tam= new Integer(1);
+			for(Integer t : this.tamanos)
+				tam *= t;
+			Integer idx = new Integer(0);
+			
+			for(int i = 0; i < tamanos.size(); i++){
+				idx += (index.get(i)*(tam/this.tamanos.get(i)));
+			}
+			ans = array[idx];
+			
+			return ans;
+		}
+		
+		public void setObjectInArray(ArrayList<Integer> index, Object var){
+			Object ans = null;
+			Integer tam= new Integer(1);
+			for(Integer t : this.tamanos)
+				tam *= t;
+			Integer idx = new Integer(0);
+			
+			for(int i = 0; i < tamanos.size(); i++){
+				idx += (index.get(i)*(tam/this.tamanos.get(i)));
+			}
+			array[idx] = var;
+			
+			
 		}
 		
 	}
