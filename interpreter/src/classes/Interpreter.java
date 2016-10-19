@@ -21,7 +21,7 @@ public class Interpreter {
 		MyLanguageLexer lexer = new MyLanguageLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		MyLanguageParser parser = new MyLanguageParser(tokens);
-		ParseTree tree = parser.condicional_si();
+		ParseTree tree = parser.programa();
 		MyVisitor<Object> loader = new MyVisitor<Object>();
 		loader.visit(tree);
 		//System.out.println("todo bien, todo bonito");

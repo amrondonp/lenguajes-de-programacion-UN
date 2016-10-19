@@ -24,10 +24,10 @@ finalizarsubproceso : Finsubproceso
 variable_retorno : ID TOKEN_ASIG
 				 |
 				 ;
-argumento : ID lista
+argumento : lista
 		  |
 		  ;
-lista : TOKEN_COMA ID lista
+lista : ID (TOKEN_COMA ID)*
 	  |
 	  ;
 
@@ -53,16 +53,14 @@ cuerpo 	: Definir definicion cuerpo
 		;
 
 
-dimensionar	: arreglo lista_arreglos TOKEN_PYC;
+dimensionar	:  lista_arreglos TOKEN_PYC;
 arreglo : ID dim;
-dim	: TOKEN_COR_IZQ expresion lista_expr TOKEN_COR_DER
-	| TOKEN_PAR_IZQ expresion lista_expr TOKEN_PAR_DER
+dim	: TOKEN_COR_IZQ  lista_expr TOKEN_COR_DER
+	| TOKEN_PAR_IZQ  lista_expr TOKEN_PAR_DER
 	;
-lista_arreglos  : TOKEN_COMA arreglo lista_arreglos
-				|
-				;
+lista_arreglos  : arreglo (TOKEN_COMA arreglo)*	;
 
-definicion	: ID lista Como tipo TOKEN_PYC ;
+definicion	: lista Como tipo TOKEN_PYC ;
 
 asignacion_llamado	: ID llamar_o_asignar TOKEN_PYC;
 llamar_o_asignar : asignar
